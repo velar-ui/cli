@@ -1,7 +1,15 @@
 {
-  "name": "Velar UI",
+  "name": "Velar",
   "version": "0.1.0",
   "description": "CLI to add composable UI components to Laravel projects",
+  "keywords": [
+    "laravel",
+    "cli",
+    "ui",
+    "blade",
+    "tailwind",
+    "alpine"
+  ],
   "type": "module",
   "bin": {
     "velar": "./dist/index.js"
@@ -13,13 +21,15 @@
     "node": ">=20"
   },
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "tsc --watch & pnpm copy-themes:watch",
+    "build": "tsc && pnpm copy-themes",
+    "copy-themes": "cp -r src/registry/themes dist/registry/",
+    "copy-themes:watch": "while true; do pnpm copy-themes; sleep 2; done",
     "lint": "eslint .",
     "prepublishOnly": "pnpm run build"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "packageManager": "pnpm@10.28.0+sha512.05df71d1421f21399e053fde567cea34d446fa02c76571441bfc1c7956e98e363088982d940465fd34480d4d90a0668bc12362f8aa88000a64e83d0b0e47be48",
   "dependencies": {
     "commander": "^14.0.2",
@@ -31,6 +41,7 @@
     "@eslint/json": "^0.14.0",
     "@eslint/markdown": "^7.5.1",
     "@types/node": "^25.0.9",
+    "@types/prompts": "^2.4.9",
     "eslint": "^9.39.2",
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
