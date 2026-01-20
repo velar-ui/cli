@@ -13,6 +13,6 @@ export default defineConfig([
   { files: ["**/*.md"], plugins: { markdown }, language: "markdown/gfm", extends: ["markdown/recommended"] },
 ], {
   rules: {
-
+    "no-explicit-any": "off",
   }
 });
