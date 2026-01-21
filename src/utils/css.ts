@@ -24,12 +24,6 @@ export function hasTailwindImport(css: string): boolean {
   return /@import\s+["']tailwindcss["']/.test(css);
 }
 
-export function ensureDir(p: string): void {
-  if (!fs.existsSync(p)) {
-    fs.mkdirSync(p, { recursive: true });
-  }
-}
-
 export function injectVelarImport(cssPath: string): void {
   let content = fs.readFileSync(cssPath, "utf8");
   if (content.includes('@import "./velar.css"')) {

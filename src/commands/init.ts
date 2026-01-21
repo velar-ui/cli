@@ -3,50 +3,75 @@ import prompts from "prompts";
 import { isLaravelProject } from "../utils/laravel.js";
 import { readPackageJson, detectTailwindV4 } from "../utils/tailwind.js";
 import {
+  hasAlpineJs,
+  hasLivewire,
+  hasInteractivitySupport,
+} from "../utils/requirements.js";
+import {
   findMainCss,
   hasTailwindImport,
-  ensureDir,
   injectVelarImport,
 } from "../utils/css.js";
 import { THEMES, copyTheme } from "../utils/theme.js";
 import { writeVelarConfig } from "../utils/config.js";
 import fs from "fs";
 import { logger } from "../utils/errors.js";
+import { FileSystemService } from "../services/FileSystemService.js";
 
 export default function registerInitCommand(program: Command) {
   program
     .command("init")
     .description("Initialize Velar in a Laravel project")
     .action(async () => {
+      const fileSystem = new FileSystemService();
       // 1. Laravel detection
       if (!isLaravelProject()) {
-        console.error("✖ No Laravel project detected.");
-        console.error("→ Run velar init at the root of a Laravel project.");
+        logger.error("No Laravel project detected");
+        logger.step("Run velar init at the root of a Laravel project");
         process.exit(1);
       }
 
-      // 2. Tailwind v4 detection
+      // 2. Interactivity detection (Alpine.js/Livewire)
+      const hasAlpine = hasAlpineJs();
+      const hasLivewireSupport = hasLivewire();
+
+      if (!hasInteractivitySupport()) {
+        logger.warning("No interactivity framework detected");
+        logger.step("Velar components work best with Alpine.js or Livewire");
+        logger.step("Install Alpine.js: npm install alpinejs");
+        logger.step("Or install Livewire: composer require livewire/livewire");
+      } else if (hasAlpine) {
+        logger.success(
+          "Alpine.js detected - components will be fully interactive",
+        );
+      } else if (hasLivewireSupport) {
+        logger.success(
+          "Livewire detected - components will work with Livewire",
+        );
+      }
+
+      // 3. Tailwind v4 detection
       const pkg = readPackageJson();
       if (!pkg || !detectTailwindV4(pkg)) {
-        console.error("✖ Tailwind CSS v4 was not detected.");
-        console.error("→ Velar requires Tailwind CSS v4+.");
+        logger.error("Tailwind CSS v4 was not detected");
+        logger.step("Velar requires Tailwind CSS v4+");
         process.exit(1);
       }
 
-      // 3. Find main CSS
+      // 4. Find main CSS
       const css = findMainCss();
       const hasCss = Boolean(css);
       const canInject = css ? hasTailwindImport(css.content) : false;
 
       if (!hasCss) {
-        console.warn("⚠ No main CSS file found.");
-        console.warn("→ Styles will be created but not auto-imported.");
+        logger.warning("No main CSS file found");
+        logger.step("Styles will be created but not auto-imported");
       } else if (!canInject) {
-        console.warn("⚠ Tailwind import not found in CSS.");
-        console.warn("→ Velar styles will not be auto-imported.");
+        logger.warning("Tailwind import not found in CSS");
+        logger.step("Velar styles will not be auto-imported");
       }
 
-      // 4. Choose theme
+      // 5. Choose theme
       const themePrompt = await prompts({
         type: "select",
         name: "theme",
@@ -60,35 +85,37 @@ export default function registerInitCommand(program: Command) {
 
       const theme = themePrompt.theme;
       if (!theme) {
-        console.log("✖ Theme selection aborted.");
+        logger.error("Theme selection aborted");
         process.exit(1);
       }
 
-      // 5. Create UI directory
+      // 6. Create UI directory
       const uiDir = "resources/views/components/ui";
-      ensureDir(uiDir);
+      await fileSystem.ensureDir(uiDir);
 
-      // 6. Create velar.css from theme
+      // 7. Create velar.css from theme
       const velarCssPath = "resources/css/velar.css";
-      ensureDir(velarCssPath.split("/").slice(0, -1).join("/"));
+      await fileSystem.ensureDir(
+        velarCssPath.split("/").slice(0, -1).join("/"),
+      );
 
       if (!hasCss || !css) {
         // fallback: always create if not present
         try {
           copyTheme(theme, velarCssPath);
-          console.log("✔ Velar theme created at:");
-          console.log("  resources/css/velar.css");
+          logger.success("Velar theme created");
+          logger.info("resources/css/velar.css");
         } catch (e) {
-          console.error((e as Error).message);
+          logger.error((e as Error).message);
           process.exit(1);
         }
       } else if (!fs.existsSync(velarCssPath)) {
         try {
           copyTheme(theme, velarCssPath);
-          console.log("✔ Velar theme created at:");
-          console.log("  resources/css/velar.css");
+          logger.success("Velar theme created");
+          logger.info("resources/css/velar.css");
         } catch (e) {
-          console.error((e as Error).message);
+          logger.error((e as Error).message);
           process.exit(1);
         }
       } else {
