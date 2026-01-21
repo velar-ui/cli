@@ -7,7 +7,7 @@ import { RegistryService } from "../services/RegistryService.js";
 import { FileSystemService } from "../services/FileSystemService.js";
 import { ConfigManager } from "../config/ConfigManager.js";
 import { ErrorHandler } from "../errors/ErrorHandler.js";
-import { logger } from "../utils/errors.js";
+import { logger } from "../utils/logger.js";
 
 export default function registerAddCommand(program: Command) {
   program
@@ -71,18 +71,29 @@ export default function registerAddCommand(program: Command) {
         const result = await componentService.addComponents(components);
 
         // Display results
-        result.added.forEach((name: string) => console.log("✔ Added", name));
+        result.added.forEach((name: string) => logger.success("Added " + name));
         result.skipped.forEach((name: string) =>
-          console.log("⚠ Skipped", name),
+          logger.warning("Skipped " + name),
         );
         result.failed.forEach(
           ({ name, error }: { name: string; error: string }) =>
-            console.log("✖ Failed to add", name, ":", error),
+            logger.error("Failed to add " + name + ": " + error),
         );
 
         if (result.added.length > 0) {
           console.log("\nNext steps:");
           console.log("  Use <x-ui.COMPONENT> in your Blade views");
+
+          // Check if JS files were added
+          const jsFiles = result.added.filter((name: string) =>
+            name.endsWith(".js"),
+          );
+          if (jsFiles.length > 0) {
+            console.log("  Import JS files in your app.js:");
+            jsFiles.forEach((file: string) =>
+              console.log(`    import './components/${file.split("/")[1]}'`),
+            );
+          }
         }
       } catch (error) {
         errorHandler.handle(error as Error, "add command");

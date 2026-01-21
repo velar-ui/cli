@@ -18,7 +18,6 @@ const REGISTRY_THEMES_DIR = path.resolve(__dirname, "../registry/themes");
 
 export function copyTheme(theme: string, target: string): void {
   const source = path.join(REGISTRY_THEMES_DIR, `${theme}.css`);
-  console.log(source);
   if (!fs.existsSync(source)) {
     throw new Error(`Theme "${theme}" not found in registry.`);
   }

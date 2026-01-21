@@ -26,6 +26,7 @@ export interface RegistryData {
 export interface VelarConfig {
   version: string;
   theme: string;
+  packageManager: string;
   css: {
     entry: string;
     velar: string;

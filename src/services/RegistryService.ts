@@ -8,7 +8,7 @@ import {
   fetchComponent,
   fetchComponentFile,
 } from "../utils/remote-registry.js";
-import { logger } from "../utils/errors.js";
+import { logger } from "../utils/logger.js";
 
 export class RegistryService {
   async fetchRegistry(): Promise<RegistryData> {

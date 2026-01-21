@@ -7,6 +7,7 @@ import {
   hasLivewire,
   hasInteractivitySupport,
 } from "../utils/requirements.js";
+import { detectPackageManager } from "../utils/package-manager.js";
 import {
   findMainCss,
   hasTailwindImport,
@@ -15,7 +16,7 @@ import {
 import { THEMES, copyTheme } from "../utils/theme.js";
 import { writeVelarConfig } from "../utils/config.js";
 import fs from "fs";
-import { logger } from "../utils/errors.js";
+import { logger } from "../utils/logger.js";
 import { FileSystemService } from "../services/FileSystemService.js";
 
 export default function registerInitCommand(program: Command) {
@@ -34,11 +35,12 @@ export default function registerInitCommand(program: Command) {
       // 2. Interactivity detection (Alpine.js/Livewire)
       const hasAlpine = hasAlpineJs();
       const hasLivewireSupport = hasLivewire();
+      const detectedPm = detectPackageManager();
 
       if (!hasInteractivitySupport()) {
         logger.warning("No interactivity framework detected");
         logger.step("Velar components work best with Alpine.js or Livewire");
-        logger.step("Install Alpine.js: npm install alpinejs");
+        logger.step(`Install Alpine.js: ${detectedPm} install alpinejs`);
         logger.step("Or install Livewire: composer require livewire/livewire");
       } else if (hasAlpine) {
         logger.success(
@@ -71,7 +73,30 @@ export default function registerInitCommand(program: Command) {
         logger.step("Velar styles will not be auto-imported");
       }
 
-      // 5. Choose theme
+      // 5. Choose package manager
+      const packageManagerPrompt = await prompts({
+        type: "select",
+        name: "packageManager",
+        message: "Which package manager are you using?",
+        choices: [
+          { title: "npm", value: "npm" },
+          { title: "yarn", value: "yarn" },
+          { title: "pnpm", value: "pnpm" },
+          { title: "bun", value: "bun" },
+        ],
+        initial:
+          ["npm", "yarn", "pnpm", "bun"].indexOf(detectedPm) >= 0
+            ? ["npm", "yarn", "pnpm", "bun"].indexOf(detectedPm)
+            : 0,
+      });
+
+      const packageManager = packageManagerPrompt.packageManager;
+      if (!packageManager) {
+        logger.error("Package manager selection aborted");
+        process.exit(1);
+      }
+
+      // 6. Choose theme
       const themePrompt = await prompts({
         type: "select",
         name: "theme",
@@ -89,11 +114,11 @@ export default function registerInitCommand(program: Command) {
         process.exit(1);
       }
 
-      // 6. Create UI directory
+      // 7. Create UI directory
       const uiDir = "resources/views/components/ui";
       await fileSystem.ensureDir(uiDir);
 
-      // 7. Create velar.css from theme
+      // 8. Create velar.css from theme
       const velarCssPath = "resources/css/velar.css";
       await fileSystem.ensureDir(
         velarCssPath.split("/").slice(0, -1).join("/"),
@@ -119,10 +144,10 @@ export default function registerInitCommand(program: Command) {
           process.exit(1);
         }
       } else {
-        console.log("✔ velar.css already exists.");
+        logger.info("velar.css already exists");
       }
 
-      // 7. Inject import if possible
+      // 8. Inject import if possible
       let importDone = false;
       if (hasCss && canInject) {
         const res = await prompts({
@@ -135,15 +160,16 @@ export default function registerInitCommand(program: Command) {
         if (res.import) {
           injectVelarImport(css!.path);
           importDone = true;
-          console.log("✔ Velar styles imported into:");
-          console.log(`  ${css!.path}`);
+          logger.success("Velar styles imported");
+          logger.info(css!.path);
         }
       }
 
-      // 8. Generate velar.json config
+      // 9. Generate velar.json config
       const config = {
         version: "0.1",
         theme,
+        packageManager,
         css: {
           entry: hasCss ? css!.path : "",
           velar: "resources/css/velar.css",
@@ -153,13 +179,14 @@ export default function registerInitCommand(program: Command) {
         },
       };
       writeVelarConfig(config);
-      console.log("✔ velar.json config generated");
+      logger.success("velar.json config generated");
 
-      // 9. Summary
+      // 10. Summary
       console.log("\n---");
       logger.success("Laravel project detected");
       logger.success("Tailwind CSS v4 detected");
       logger.success(`Theme selected: ${theme}`);
+      logger.success(`Package manager: ${packageManager}`);
       logger.success("UI components directory ready");
       logger.success(
         importDone ? "Styles import complete" : "Styles import pending",

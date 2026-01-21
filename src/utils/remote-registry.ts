@@ -1,5 +1,5 @@
 import { getGitHubRegistryUrl } from "./environment.js";
-import { NetworkError, ComponentNotFoundError } from "./errors.js";
+import { NetworkError, ComponentNotFoundError } from "../errors/errors.js";
 import type {
   GitHubFile,
   RegistryData,

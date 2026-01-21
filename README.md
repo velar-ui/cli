@@ -68,7 +68,7 @@ Velar will:
 
 By default, components are placed in:
 
-```
+```bash
 resources/views/components/ui
 ```
 

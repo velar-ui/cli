@@ -1,6 +1,6 @@
 import type { VelarConfig } from "../types/index.js";
 import { readVelarConfig } from "../utils/config.js";
-import { logger } from "../utils/errors.js";
+import { logger } from "../utils/logger.js";
 
 export class ConfigManager {
   private config?: VelarConfig;
@@ -16,6 +16,13 @@ export class ConfigManager {
       logger.error("Failed to load configuration");
       throw error;
     }
+  }
+
+  getPackageManager(): string {
+    if (!this.config) {
+      throw new Error("Configuration not loaded");
+    }
+    return this.config.packageManager || "npm";
   }
 
   validate(): boolean {
