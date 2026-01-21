@@ -26,7 +26,10 @@
     "copy-themes": "cp -r src/registry/themes dist/registry/",
     "copy-themes:watch": "while true; do pnpm copy-themes; sleep 2; done",
     "lint": "eslint .",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "format": "prettier --write .",
+    "check:ci": "pnpm run lint && pnpm run typecheck",
+    "typecheck": "tsc --noEmit"
   },
   "author": "",
   "license": "MIT",
@@ -46,6 +49,7 @@
     "eslint": "^9.39.2",
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
+    "prettier": "3.8.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.53.0"
   }

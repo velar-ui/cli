@@ -1,20 +1,20 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 export const THEMES = [
-  'neutral',
-  'blue',
-  'green',
-  'orange',
-  'red',
-  'rose',
-  'violet',
-  'yellow',
+  "neutral",
+  "blue",
+  "green",
+  "orange",
+  "red",
+  "rose",
+  "violet",
+  "yellow",
 ];
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REGISTRY_THEMES_DIR = path.resolve(__dirname, '../registry/themes');
+const REGISTRY_THEMES_DIR = path.resolve(__dirname, "../registry/themes");
 
 export function copyTheme(theme: string, target: string): void {
   const source = path.join(REGISTRY_THEMES_DIR, `${theme}.css`);

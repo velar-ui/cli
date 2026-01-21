@@ -1,159 +1,91 @@
 #!/usr/bin/env node
-import chalk from 'chalk';
-import { Command } from 'commander';
-import prompts from 'prompts';
+import { Command } from "commander";
+import prompts from "prompts";
 
-import { readVelarConfig } from '../utils/config.js';
-import { readRegistry, getComponentMeta } from '../utils/registry.js';
-import { resolveDependencies } from '../utils/deps.js';
-import { checkRequirements, hasAlpineInProject } from '../utils/requirements.js';
-import { fileExists, copyFile } from '../utils/filesystem.js';
-import path from 'path';
-import type { VelarComponentMeta } from '../types/meta.js';
+import { ComponentService } from "../services/ComponentService.js";
+import { RegistryService } from "../services/RegistryService.js";
+import { FileSystemService } from "../services/FileSystemService.js";
+import { ConfigManager } from "../config/ConfigManager.js";
+import { ErrorHandler } from "../errors/ErrorHandler.js";
+import { logger } from "../utils/errors.js";
 
 export default function registerAddCommand(program: Command) {
-
-
   program
-    .command('add')
-    .argument('[components...]', 'Names of components to add')
-    .description('Add one or more UI components to your Laravel project')
+    .command("add")
+    .argument("[components...]", "Names of components to add")
+    .description("Add one or more UI components to your Laravel project")
     .action(async (components?: string[]) => {
-      // 1. Check velar.json
-      let config;
+      const errorHandler = new ErrorHandler();
+
       try {
-        config = readVelarConfig();
-      } catch {
-        console.error(chalk.red('✖ Velar is not initialized.'));
-        console.error(chalk.yellow('→ Run velar init first.'));
-        process.exit(1);
-      }
+        // Initialize services
+        const configManager = new ConfigManager();
+        await configManager.load();
 
-      // 2. Read config
-      const componentsPath = config.components.path;
-      const themePath = config.css.velar;
-      const theme = config.theme;
+        const fileSystem = new FileSystemService();
+        const registryService = new RegistryService();
+        const componentService = new ComponentService(
+          registryService,
+          fileSystem,
+          configManager,
+        );
 
-      // 3. Load registry
-      const registryPath = path.resolve(path.dirname(new URL(import.meta.url).pathname), '../registry');
-      let registry;
-      try {
-        registry = readRegistry(registryPath);
-      } catch {
-        console.error('✖ Registry not found.');
-        process.exit(1);
-      }
-
-      // If no components provided, prompt for selection (multi)
-      if (!components || components.length === 0) {
-        const available = Object.keys(registry.components);
-        const res = await prompts({
-          type: 'autocompleteMultiselect',
-          name: 'selected',
-          message: 'Select components to add',
-          choices: available.map(c => ({ title: c, value: c })),
-          min: 1
-        });
-        if (!res.selected || res.selected.length === 0) {
-          console.log('✖ No component selected.');
-          process.exit(0);
-        }
-        components = res.selected as string[];
-      }
-
-      // Permit add button tabs ...
-      for (const component of components) {
-        if (!registry.components[component]) {
-          console.error(`✖ Component "${component}" not found.`);
-          console.error('→ Run velar list to see available components.');
-          process.exit(1);
-        }
-      }
-
-      // For each requested component 
-      for (const component of components) {
-        // 4. Read component meta
-        let meta: VelarComponentMeta;
-        try {
-          meta = getComponentMeta(registryPath, component);
-        } catch {
-          console.error(`✖ Component "${component}" not found.`);
+        // Validate configuration
+        if (!configManager.validate()) {
+          logger.error("Velar is not initialized");
+          logger.step("Run velar init first");
           process.exit(1);
         }
 
-        // 5. Resolve dependencies (DAG, no cycles)
-        let toAdd;
-        try {
-          toAdd = resolveDependencies(meta, registry);
-        } catch (e) {
-          console.error((e as Error).message);
-          process.exit(1);
-        }
+        // Load registry
+        const registry = await registryService.fetchRegistry();
 
-        // 6. Validate requirements (Alpine, etc)
-        const project = { hasAlpine: hasAlpineInProject() };
-        try {
-          for (const name of toAdd) {
-            const depMeta: VelarComponentMeta = getComponentMeta(registryPath, name);
-            if (depMeta.requires && Object.keys(depMeta.requires).length > 0) {
-              checkRequirements(depMeta, project);
-            }
+        // If no components provided, prompt for selection
+        if (!components || components.length === 0) {
+          const available = registry.components.map((c) => c.name);
+          const res = await prompts({
+            type: "multiselect",
+            name: "selected",
+            message: "Select components to add",
+            choices: available.map((c: string) => ({ title: c, value: c })),
+            min: 1,
+          });
+
+          if (!res.selected || res.selected.length === 0) {
+            logger.warning("No component selected");
+            process.exit(0);
           }
-        } catch (e) {
-          console.error(`✖ ${(e as Error).message}`);
-          process.exit(1);
+          components = res.selected as string[];
         }
 
-        // 7. Determine final path and handle conflicts
-        const summary: string[] = [];
-        for (const name of toAdd) {
-          const depMeta: VelarComponentMeta = getComponentMeta(registryPath, name);
-          const bladeFiles = depMeta.files.filter(f => f.type === 'blade');
-          for (const file of bladeFiles) {
-            const src = path.join(registryPath, 'components', name, file.path);
-            const dest = path.join(componentsPath, `${name}.blade.php`);
-            if (fileExists(dest)) {
-              // Prompt for conflict resolution
-              const res = await prompts({
-                type: 'select',
-                name: 'action',
-                message: `⚠ Component "${name}" already exists.\nWhat do you want to do?`,
-                choices: [
-                  { title: 'Skip', value: 'skip' },
-                  { title: 'Overwrite', value: 'overwrite' },
-                  { title: 'Cancel', value: 'cancel' },
-                ],
-                initial: 0,
-              });
-              if (res.action === 'skip') {
-                summary.push(`Skipped ${name}`);
-                continue;
-              } else if (res.action === 'cancel') {
-                console.log('✖ Cancelled.');
-                process.exit(0);
-              } // else overwrite
-            }
-            try {
-              copyFile(src, dest);
-              summary.push(`Added ${name}`);
-            } catch {
-              summary.push(`Failed to add ${name}`);
-            }
+        // Validate components exist
+        for (const component of components) {
+          if (!registry.components.find((c) => c.name === component)) {
+            logger.error(`Component "${component}" not found`);
+            logger.step("Run velar list to see available components");
+            process.exit(1);
           }
         }
 
-        // 10. Print summary for this component
-        for (const line of summary) {
-          if (line.startsWith('Added')) {
-            console.log('✔', line);
-          } else if (line.startsWith('Skipped')) {
-            console.log('⚠', line);
-          } else {
-            console.log('✖', line);
-          }
+        // Add components
+        const result = await componentService.addComponents(components);
+
+        // Display results
+        result.added.forEach((name: string) => console.log("✔ Added", name));
+        result.skipped.forEach((name: string) =>
+          console.log("⚠ Skipped", name),
+        );
+        result.failed.forEach(
+          ({ name, error }: { name: string; error: string }) =>
+            console.log("✖ Failed to add", name, ":", error),
+        );
+
+        if (result.added.length > 0) {
+          console.log("\nNext steps:");
+          console.log("  Use <x-ui.COMPONENT> in your Blade views");
         }
+      } catch (error) {
+        errorHandler.handle(error as Error, "add command");
       }
-      console.log('\nNext steps:');
-      console.log('  Use <x-ui.COMPONENT> in your Blade views');
     });
 }
