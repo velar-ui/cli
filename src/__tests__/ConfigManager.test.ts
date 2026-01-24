@@ -86,5 +86,30 @@ describe("ConfigManager", () => {
     it("should throw if getting components path before load", () => {
       expect(() => configManager.getComponentsPath()).toThrow("Configuration not loaded");
     });
+
+    it("should throw if getting theme path before load", () => {
+      expect(() => configManager.getThemePath()).toThrow("Configuration not loaded");
+    });
+
+    it("should throw if getting JS entry path before load", () => {
+      expect(() => configManager.getJsEntryPath()).toThrow("Configuration not loaded");
+    });
+
+    it("should throw if getting theme before load", () => {
+      expect(() => configManager.getTheme()).toThrow("Configuration not loaded");
+    });
+  });
+
+  it("should throw if config is missing after load", async () => {
+    vi.mocked(configUtils.readVelarConfig).mockReturnValue(undefined as any);
+    await expect(configManager.load()).rejects.toThrow("Configuration not found");
+  });
+
+  it("should return empty JS entry if not present in config", async () => {
+    const configNoJs = { ...mockConfig };
+    delete (configNoJs as any).js;
+    vi.mocked(configUtils.readVelarConfig).mockReturnValue(configNoJs);
+    await configManager.load();
+    expect(configManager.getJsEntryPath()).toBe("");
   });
 });

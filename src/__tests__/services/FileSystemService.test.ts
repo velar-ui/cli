@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { FileSystemService } from "../services/FileSystemService.js";
+import { FileSystemService } from "../../services/FileSystemService.js";
 import { promises as fs } from "fs";
 import path from "path";
 

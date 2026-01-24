@@ -1,15 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { AddService } from "../services/AddService.js";
-import { ComponentService } from "../services/ComponentService.js";
-import { IRegistryService, IConfigManager } from "../types/interfaces.js";
-import { RegistryData, AddResult } from "../types/index.js";
-import { logger } from "../utils/logger.js";
+import { AddService } from "../../services/AddService.js";
+import { ComponentService } from "../../services/ComponentService.js";
+import { IRegistryService, IConfigManager } from "../../types/interfaces.js";
+import { RegistryData, AddResult } from "../../types/index.js";
+import { logger } from "../../utils/logger.js";
 
-vi.mock("../utils/logger.js", () => ({
+vi.mock("../../utils/logger.js", () => ({
   logger: {
     success: vi.fn(),
     warning: vi.fn(),
     error: vi.fn(),
+    info: vi.fn(),
+    step: vi.fn(),
   },
 }));
 
@@ -34,6 +36,7 @@ describe("AddService", () => {
       getComponentsPath: vi.fn(),
       getThemePath: vi.fn(),
       getTheme: vi.fn(),
+      getJsEntryPath: vi.fn(),
     } as any;
 
     mockComponentService = {
@@ -121,6 +124,33 @@ describe("AddService", () => {
       const result: AddResult = { added: [], skipped: [], failed: [{ name: "comp", error: "err" }] };
       addService.displayResults(result);
       expect(logger.error).toHaveBeenCalledWith("Failed to add comp: err");
+    });
+  });
+
+  describe("displayNextSteps", () => {
+    it("should do nothing if no files added", () => {
+      const result: AddResult = { added: [], skipped: [], failed: [] };
+      addService.displayNextSteps(result);
+      // No log expected
+    });
+
+    it("should display next steps for blade components", () => {
+      const spy = vi.spyOn(console, "log");
+      const result: AddResult = { added: ["button/button.blade.php"], skipped: [], failed: [] };
+      addService.displayNextSteps(result);
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining("Use <x-ui.COMPONENT>"));
+    });
+
+    it("should display JS import reminder if JS entry is missing", () => {
+      const spy = vi.spyOn(console, "log");
+      mockConfigManager.validate.mockReturnValue(true);
+      mockConfigManager.getJsEntryPath.mockReturnValue("");
+      
+      const result: AddResult = { added: ["datepicker/datepicker.js"], skipped: [], failed: [] };
+      addService.displayNextSteps(result);
+      
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining("Import JS files in your app.js"));
+      expect(spy).toHaveBeenCalledWith(expect.stringContaining("import './ui/datepicker.js'"));
     });
   });
 });

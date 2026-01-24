@@ -1,5 +1,5 @@
-import type { FetchOptions } from "../types/index.js";
 import { NetworkError } from "../errors/errors.js";
+import type { FetchOptions } from "../types/index.js";
 
 /**
  * Default retry options
@@ -132,7 +132,7 @@ export class HttpService {
         ) {
           return response;
         }
-
+        console.log("Attempt: ", attempt);
         // If this is the last attempt, throw error
         if (attempt === retryOptions.maxRetries) {
           throw new NetworkError(
@@ -171,6 +171,9 @@ export class HttpService {
 
         // If this is the last attempt, throw error
         if (attempt === retryOptions.maxRetries) {
+          if (lastError instanceof NetworkError) {
+            throw lastError;
+          }
           throw new NetworkError(
             `Request failed after ${retryOptions.maxRetries + 1} attempts: ${lastError.message}`,
             lastError,

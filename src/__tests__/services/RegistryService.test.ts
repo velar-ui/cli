@@ -1,16 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { RegistryService } from "../services/RegistryService.js";
-import { HttpService } from "../services/HttpService.js";
-import { spinner } from "../utils/spinner.js";
-import * as remoteRegistry from "../utils/remote-registry.js";
+import { RegistryService } from "../../services/RegistryService.js";
+import { HttpService } from "../../services/HttpService.js";
+import { spinner } from "../../utils/spinner.js";
+import * as remoteRegistry from "../../utils/remote-registry.js";
 
-vi.mock("../utils/spinner.js", () => ({
+vi.mock("../../utils/spinner.js", () => ({
   spinner: {
     withTask: vi.fn((msg, task) => task()),
   },
 }));
 
-vi.mock("../utils/remote-registry.js", () => ({
+vi.mock("../../utils/remote-registry.js", () => ({
   fetchGitHubRegistry: vi.fn(),
   fetchComponent: vi.fn(),
   fetchComponentFile: vi.fn(),

@@ -1,13 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { InitService } from "../services/InitService.js";
-import { IFileSystemService } from "../types/interfaces.js";
-import * as laravelUtils from "../utils/laravel.js";
-import * as tailwindUtils from "../utils/tailwind.js";
-import * as packageManagerUtils from "../utils/package-manager.js";
-import * as cssUtils from "../utils/css.js";
-import * as configUtils from "../utils/config.js";
-import { logger } from "../utils/logger.js";
+import { InitService } from "../../services/InitService.js";
+import { IFileSystemService } from "../../types/interfaces.js";
+import * as laravelUtils from "../../utils/laravel.js";
+import * as tailwindUtils from "../../utils/tailwind.js";
+import * as packageManagerUtils from "../../utils/package-manager.js";
+import * as cssUtils from "../../utils/css.js";
+import * as configUtils from "../../utils/config.js";
+import { logger } from "../../utils/logger.js";
+import fs from "fs";
 
+vi.mock("fs");
 vi.mock("../utils/laravel.js");
 vi.mock("../utils/tailwind.js");
 vi.mock("../utils/package-manager.js");
@@ -97,25 +99,63 @@ describe("InitService", () => {
         canInjectCss: false,
         hasAlpine: false,
         hasLivewire: false,
+        detectedPackageManager: "npm"
       } as any;
 
       initService.displayEnvironmentInfo(validation);
       expect(spyWarning).toHaveBeenCalledWith("No main CSS file found");
       expect(spyWarning).toHaveBeenCalledWith("No main JS file found");
     });
+
+    it("should log success if Alpine is detected", () => {
+      const spySuccess = vi.spyOn(logger, "success");
+      const validation = {
+        cssFile: {},
+        jsFile: {},
+        canInjectCss: true,
+        hasAlpine: true,
+        hasLivewire: false,
+        detectedPackageManager: "npm"
+      } as any;
+
+      initService.displayEnvironmentInfo(validation);
+      expect(spySuccess).toHaveBeenCalledWith(expect.stringContaining("Alpine.js detected"));
+    });
+
+    it("should log success if Livewire is detected", () => {
+      const spySuccess = vi.spyOn(logger, "success");
+      const validation = {
+        cssFile: {},
+        jsFile: {},
+        canInjectCss: true,
+        hasAlpine: false,
+        hasLivewire: true,
+        detectedPackageManager: "npm"
+      } as any;
+
+      initService.displayEnvironmentInfo(validation);
+      expect(spySuccess).toHaveBeenCalledWith(expect.stringContaining("Livewire detected"));
+    });
   });
 
   describe("createThemeFile", () => {
     it("should create theme file if it doesn't exist", async () => {
-      vi.mock("fs", async () => {
-        const actual = await vi.importActual("fs");
-        return {
-          ...actual,
-          existsSync: vi.fn().mockReturnValue(false),
-        };
-      });
-      // We need to re-mock fs because it was already mocked in other tests potentially
-      // or use a simpler approach since InitService uses fs.existsSync directly
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      const themeUtils = await import("../../utils/theme.js");
+      
+      await initService.createThemeFile("blue");
+      
+      expect(mockFileSystem.ensureDir).toHaveBeenCalledWith("resources/css");
+      expect(themeUtils.copyTheme).toHaveBeenCalledWith("blue", "resources/css/velar.css");
+    });
+
+    it("should skip if theme file already exists", async () => {
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      const spyInfo = vi.spyOn(logger, "info");
+      
+      await initService.createThemeFile("blue");
+      
+      expect(spyInfo).toHaveBeenCalledWith("velar.css already exists");
     });
   });
 
