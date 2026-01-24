@@ -1,9 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ListService } from "../services/ListService.js";
-import { RegistryService } from "../services/RegistryService.js";
-import { ConfigManager } from "../config/ConfigManager.js";
-import { FileSystemService } from "../services/FileSystemService.js";
-import type { VelarComponentMeta, RegistryData } from "../types/index.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ConfigManager } from "../../config/ConfigManager.js";
+import { FileSystemService } from "../../services/FileSystemService.js";
+import { ListService } from "../../services/ListService.js";
+import { RegistryService } from "../../services/RegistryService.js";
+import type { RegistryData, VelarComponentMeta } from "../../types/index.js";
 
 describe("ListService", () => {
   let listService: ListService;
@@ -29,13 +29,15 @@ describe("ListService", () => {
     listService = new ListService(
       mockRegistryService,
       mockConfigManager,
-      mockFileSystem
+      mockFileSystem,
     );
   });
 
   it("should fetch registry from registry service", async () => {
     const mockRegistry: RegistryData = { components: [] };
-    vi.mocked(mockRegistryService.fetchRegistry).mockResolvedValue(mockRegistry);
+    vi.mocked(mockRegistryService.fetchRegistry).mockResolvedValue(
+      mockRegistry,
+    );
 
     const result = await listService.fetchRegistry();
 
@@ -56,23 +58,33 @@ describe("ListService", () => {
   });
 
   it("should check if component is installed", async () => {
-    const component: VelarComponentMeta = { name: "Button", path: "Button", files: [] };
-    
+    const component: VelarComponentMeta = {
+      name: "Button",
+      path: "Button",
+      files: [],
+    };
+
     vi.mocked(mockConfigManager.validate).mockReturnValue(true);
-    vi.mocked(mockConfigManager.getComponentsPath).mockReturnValue("resources/views/components/velar");
+    vi.mocked(mockConfigManager.getComponentsPath).mockReturnValue(
+      "resources/views/components/velar",
+    );
     vi.mocked(mockFileSystem.fileExists).mockResolvedValue(true);
 
     const isInstalled = await listService.isComponentInstalled(component);
 
     expect(isInstalled).toBe(true);
     expect(mockFileSystem.fileExists).toHaveBeenCalledWith(
-      expect.stringContaining("Button.blade.php")
+      expect.stringContaining("Button.blade.php"),
     );
   });
 
   it("should load config if not validated when checking installation", async () => {
-    const component: VelarComponentMeta = { name: "Button", path: "Button", files: [] };
-    
+    const component: VelarComponentMeta = {
+      name: "Button",
+      path: "Button",
+      files: [],
+    };
+
     vi.mocked(mockConfigManager.validate).mockReturnValue(false);
     vi.mocked(mockConfigManager.getComponentsPath).mockReturnValue("path");
     vi.mocked(mockFileSystem.fileExists).mockResolvedValue(false);
