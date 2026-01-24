@@ -10,6 +10,7 @@ import * as p from "@clack/prompts";
 import path from "path";
 import { logger } from "../utils/logger.js";
 import { FileSystemService } from "./FileSystemService.js";
+import { injectComponentJs } from "../utils/js.js";
 
 /**
  * Service for managing component operations
@@ -121,6 +122,11 @@ export class ComponentService {
         try {
           await this.fileSystem.writeFile(dest, content);
           result.added.push(`${comp.name}/${file.path}`);
+
+          // Handle JS auto-import
+          if (file.type === "js") {
+            await this.autoImportJs(comp.name);
+          }
         } catch (error) {
           result.failed.push({
             name: `${comp.name}/${file.path}`,
@@ -131,6 +137,29 @@ export class ComponentService {
     }
 
     return result;
+  }
+
+  /**
+   * Automatically import component JS into the main JS entry
+   * @param componentName - Name of the component
+   */
+  private async autoImportJs(componentName: string): Promise<void> {
+    try {
+      const jsEntry = this.configManager?.getJsEntryPath();
+      if (!jsEntry || !(await this.fileSystem.fileExists(jsEntry))) {
+        return;
+      }
+
+      const importPath = `./ui/${componentName}`;
+      injectComponentJs(jsEntry, componentName, importPath);
+      logger.success(`Auto-imported ${componentName} into ${jsEntry}`);
+    } catch (error) {
+      logger.warning(
+        `Failed to auto-import JS for ${componentName}: ${
+          (error as Error).message
+        }`,
+      );
+    }
   }
 
   /**
@@ -149,7 +178,7 @@ export class ComponentService {
       case "blade":
         return path.join(componentsPath, `${component.name}.blade.php`);
       case "js":
-        return path.join("resources/js/components", `${component.name}.js`);
+        return path.join("resources/js/ui", `${component.name}.js`);
       case "css":
         return path.join("resources/css/components", `${component.name}.css`);
       default:

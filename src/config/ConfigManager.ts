@@ -76,6 +76,18 @@ export class ConfigManager implements IConfigManager {
   }
 
   /**
+   * Get the JS entry path from config
+   * @returns JS entry file path
+   * @throws Error if config not loaded
+   */
+  getJsEntryPath(): string {
+    if (!this.config) {
+      throw new Error("Configuration not loaded");
+    }
+    return this.config.js?.entry ?? "";
+  }
+
+  /**
    * Get the selected theme from config
    * @returns Theme name
    * @throws Error if config not loaded

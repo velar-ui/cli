@@ -84,6 +84,11 @@ export interface VelarConfig {
     /** Velar CSS file path */
     velar: string;
   };
+  /** JS configuration */
+  js: {
+    /** Main JS file path */
+    entry: string;
+  };
   /** Components configuration */
   components: {
     /** Path where components are stored */
@@ -154,9 +159,9 @@ export interface ComponentList {
 }
 
 /**
- * Main CSS file information
+ * Main file information (CSS or JS)
  */
-export interface CssFileInfo {
+export interface FileInfo {
   /** File path */
   path: string;
   /** File content */

@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { CssFileInfo } from "../types/index.js";
+import type { FileInfo } from "../types/index.js";
 
 /**
  * Common CSS file paths to check for main stylesheet
@@ -16,7 +16,7 @@ export const CSS_CANDIDATES = [
  * Find the main CSS file in the project
  * @returns CSS file info if found, null otherwise
  */
-export function findMainCss(): CssFileInfo | null {
+export function findMainCss(): FileInfo | null {
   for (const rel of CSS_CANDIDATES) {
     if (fs.existsSync(rel)) {
       return {

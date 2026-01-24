@@ -2,7 +2,7 @@ import type {
   VelarConfig,
   PackageManager,
   VelarTheme,
-  CssFileInfo,
+  FileInfo,
 } from "../types/index.js";
 import type { IFileSystemService } from "../types/interfaces.js";
 import { isLaravelProject } from "../utils/laravel.js";
@@ -18,6 +18,7 @@ import {
   hasTailwindImport,
   injectVelarImport,
 } from "../utils/css.js";
+import { findMainJs } from "../utils/js.js";
 import { copyTheme } from "../utils/theme.js";
 import { writeVelarConfig } from "../utils/config.js";
 import fs from "fs";
@@ -38,7 +39,9 @@ export interface EnvironmentValidation {
   /** Detected package manager */
   detectedPackageManager: PackageManager;
   /** Main CSS file info if found */
-  cssFile: CssFileInfo | null;
+  cssFile: FileInfo | null;
+  /** Main JS file info if found */
+  jsFile: FileInfo | null;
   /** Whether CSS can be injected */
   canInjectCss: boolean;
 }
@@ -87,8 +90,9 @@ export class InitService {
     const hasLivewireSupport = hasLivewire();
     const detectedPm = detectPackageManager();
 
-    // Find CSS file
+    // Find CSS and JS files
     const css = findMainCss();
+    const js = findMainJs();
     const canInject = css ? hasTailwindImport(css.content) : false;
 
     return {
@@ -98,6 +102,7 @@ export class InitService {
       hasLivewire: hasLivewireSupport,
       detectedPackageManager: detectedPm,
       cssFile: css,
+      jsFile: js,
       canInjectCss: canInject,
     };
   }
@@ -130,6 +135,12 @@ export class InitService {
     } else if (!validation.canInjectCss) {
       logger.warning("Tailwind import not found in CSS");
       logger.step("Velar styles will not be auto-imported");
+    }
+
+    // Display JS file status
+    if (!validation.jsFile) {
+      logger.warning("No main JS file found");
+      logger.step("Component scripts will not be auto-imported");
     }
   }
 
@@ -204,6 +215,9 @@ export class InitService {
         entry: validation.cssFile?.path ?? "",
         velar: "resources/css/velar.css",
       },
+      js: {
+        entry: validation.jsFile?.path ?? "",
+      },
       components: {
         path: "resources/views/components/ui",
       },
@@ -230,6 +244,9 @@ export class InitService {
     logger.success(`Theme selected: ${options.theme}`);
     logger.success(`Package manager: ${options.packageManager}`);
     logger.success("UI components directory ready");
+    if (validation.jsFile) {
+      logger.success("Main JS file detected");
+    }
     logger.success(
       stylesImported ? "Styles import complete" : "Styles import pending",
     );

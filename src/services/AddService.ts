@@ -103,14 +103,16 @@ export class AddService {
     console.log("\nNext steps:");
     console.log("  Use <x-ui.COMPONENT> in your Blade views");
 
-    // Check if JS files were added
+    // Check if JS files were added but not auto-imported
     const jsFiles = result.added.filter((name) => name.endsWith(".js"));
-    if (jsFiles.length > 0) {
+    const hasJsEntry = this.configManager.validate() && this.configManager.getJsEntryPath();
+
+    if (jsFiles.length > 0 && !hasJsEntry) {
       console.log("  Import JS files in your app.js:");
       jsFiles.forEach((file) => {
         const fileName = file.split("/")[1];
         if (fileName) {
-          console.log(`    import './components/${fileName}'`);
+          console.log(`    import './ui/${fileName}'`);
         }
       });
     }

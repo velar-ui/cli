@@ -113,6 +113,13 @@ export interface IConfigManager {
   getThemePath(): string;
 
   /**
+   * Get the JS entry path from config
+   * @returns JS entry file path
+   * @throws Error if config not loaded
+   */
+  getJsEntryPath(): string;
+
+  /**
    * Get the selected theme from config
    * @returns Theme name
    * @throws Error if config not loaded
