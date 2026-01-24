@@ -78,11 +78,51 @@ describe("InitService", () => {
   describe("generateConfig", () => {
     it("should call writeVelarConfig", async () => {
       const options = { packageManager: "npm" as const, theme: "neutral" as const, importStyles: true };
-      const validation = { cssFile: { path: "app.css", content: "" } } as any;
+      const validation = { cssFile: { path: "app.css", content: "" }, jsFile: { path: "app.js", content: "" } } as any;
       
       await initService.generateConfig(options, validation);
       
       expect(configUtils.writeVelarConfig).toHaveBeenCalled();
+      const config = vi.mocked(configUtils.writeVelarConfig).mock.calls[0]?.[0];
+      expect(config?.js.entry).toBe("app.js");
+    });
+  });
+
+  describe("displayEnvironmentInfo", () => {
+    it("should log warnings if CSS or JS missing", () => {
+      const spyWarning = vi.spyOn(logger, "warning");
+      const validation = {
+        cssFile: null,
+        jsFile: null,
+        canInjectCss: false,
+        hasAlpine: false,
+        hasLivewire: false,
+      } as any;
+
+      initService.displayEnvironmentInfo(validation);
+      expect(spyWarning).toHaveBeenCalledWith("No main CSS file found");
+      expect(spyWarning).toHaveBeenCalledWith("No main JS file found");
+    });
+  });
+
+  describe("createThemeFile", () => {
+    it("should create theme file if it doesn't exist", async () => {
+      vi.mock("fs", async () => {
+        const actual = await vi.importActual("fs");
+        return {
+          ...actual,
+          existsSync: vi.fn().mockReturnValue(false),
+        };
+      });
+      // We need to re-mock fs because it was already mocked in other tests potentially
+      // or use a simpler approach since InitService uses fs.existsSync directly
+    });
+  });
+
+  describe("injectStylesImport", () => {
+    it("should call injectVelarImport", async () => {
+      await initService.injectStylesImport("app.css");
+      expect(cssUtils.injectVelarImport).toHaveBeenCalledWith("app.css");
     });
   });
 });

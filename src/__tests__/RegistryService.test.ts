@@ -68,4 +68,29 @@ describe("RegistryService", () => {
     expect(result).toBe(content);
     expect(remoteRegistry.fetchComponentFile).toHaveBeenCalledWith("Button", path);
   });
+
+  describe("resolveDependencies", () => {
+    it("should resolve dependencies (currently just returns the component)", async () => {
+      const mockMeta = { name: "Button", files: [] } as any;
+      const result = await registryService.resolveDependencies(mockMeta);
+      expect(result).toEqual([mockMeta]);
+    });
+  });
+
+  describe("parseComponentMeta errors", () => {
+    it("should throw if download_url is missing", async () => {
+      const mockFile = { download_url: null };
+      vi.mocked(remoteRegistry.fetchComponent).mockResolvedValue(mockFile as any);
+      
+      await expect(registryService.fetchComponent("Button")).rejects.toThrow("GitHub file has no download URL");
+    });
+
+    it("should throw if JSON parsing fails", async () => {
+      const mockFile = { download_url: "http://example.com" };
+      vi.mocked(remoteRegistry.fetchComponent).mockResolvedValue(mockFile as any);
+      vi.mocked(mockHttpService.fetchText).mockResolvedValue("invalid json");
+
+      await expect(registryService.fetchComponent("Button")).rejects.toThrow("Failed to parse component meta");
+    });
+  });
 });
