@@ -45,7 +45,7 @@ export function deleteFileBackup(filePath: string): boolean {
   try {
     fsExtra.unlinkSync(backupPath);
     return true;
-  } catch (error) {
+  } catch {
     // Best effort - don't log as this is just cleanup
     return false;
   }

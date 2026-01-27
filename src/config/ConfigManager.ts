@@ -28,7 +28,7 @@ export class ConfigManager implements IConfigManager {
         process.exit(1);
       }
       return this.config;
-    } catch (error) {
+    } catch {
       logger.error("");
       handleError(new Error("Something went wrong. Please try again."));
       process.exit(1);

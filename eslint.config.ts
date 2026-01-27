@@ -1,36 +1,25 @@
 import js from "@eslint/js";
-import json from "@eslint/json";
-import markdown from "@eslint/markdown";
-import { defineConfig, globalIgnores } from "eslint/config";
+import { defineConfig } from "eslint/config";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 
-export default defineConfig(
-  [
-    {
-      files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
-      plugins: { js },
-      extends: ["js/recommended", "turbo", "prettier"],
-      languageOptions: { globals: globals.browser },
-    },
-    tseslint.configs.recommended,
-    globalIgnores(["node_modules/**", "dist/**", "src/__tests__"]),
-    {
-      files: ["**/*.jsonc"],
-      plugins: { json },
-      language: "json/jsonc",
-      extends: ["json/recommended"],
-    },
-    {
-      files: ["**/*.md"],
-      plugins: { markdown },
-      language: "markdown/gfm",
-      extends: ["markdown/recommended"],
-    },
-  ],
+export default defineConfig([
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
   {
-    rules: {
-      "no-explicit-any": "off",
+    languageOptions: {
+      globals: {
+        ...globals.node,
+        ...globals.browser,
+      },
     },
   },
-);
+  {
+    ignores: ["node_modules/**", "dist/**", "src/__tests__/**", "coverage/**"],
+  },
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+]);
