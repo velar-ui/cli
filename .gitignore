@@ -23,3 +23,14 @@ Thumbs.db
 .vscode/
 .idea/
 /coverage/
+
+# generated config artifacts
+eslint.config.js
+eslint.config.d.ts
+eslint.config.d.ts.map
+tsup.config.js
+tsup.config.d.ts
+tsup.config.d.ts.map
+vitest.config.js
+vitest.config.d.ts
+vitest.config.d.ts.map
