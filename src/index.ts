@@ -10,7 +10,7 @@ import packageJson from "../package.json";
  */
 function displayIntro(): void {
   console.log("");
-  console.log(chalk.bold.cyan("  ▼ VELAR CLI v0.1.0"));
+  console.log(chalk.bold.cyan(`  ▼ VELAR CLI v${packageJson.version}`));
   console.log(chalk.gray("  Tailwind CSS v4+ components for Laravel"));
   console.log("");
 }
