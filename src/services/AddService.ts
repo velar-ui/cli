@@ -1,9 +1,9 @@
-import type { AddResult, RegistryData } from "../types/index.js";
-import type { IRegistryService } from "../types/interfaces.js";
-import type { IConfigManager } from "../types/interfaces.js";
-import { ComponentService } from "./ComponentService.js";
-import { FileSystemService } from "./FileSystemService.js";
-import { logger } from "../utils/logger.js";
+import type { AddResult, RegistryData } from "../types/index";
+import type { IRegistryService } from "../types/interfaces";
+import type { IConfigManager } from "../types/interfaces";
+import { ComponentService } from "./ComponentService";
+import { FileSystemService } from "./FileSystemService";
+import { logger } from "../utils/logger";
 
 /**
  * Service for handling component addition operations

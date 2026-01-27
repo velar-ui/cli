@@ -24,7 +24,6 @@ export const addOptionsSchema = z.object({
 export const add = new Command()
   .name("add")
   .argument("[components...]", "Names of components to add")
-  .option("-y, --yes", "Skip confirmation prompt")
   .option("-y, --yes", "skip confirmation prompt.", false)
   .option("-o, --overwrite", "overwrite existing files.", false)
   .option(

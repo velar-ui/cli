@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { FileInfo } from "../types/index.js";
+import type { FileInfo } from "../types/index";
 
 /**
  * Common CSS file paths to check for main stylesheet

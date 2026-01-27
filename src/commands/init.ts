@@ -16,8 +16,7 @@ process.on("exit", (code) => {
 });
 
 export const init = new Command()
-
-  .command("init")
+  .name("init")
   .description("initialize your project and install dependencies")
   .option(
     "-b, --base-color <base-color>",
@@ -33,7 +32,7 @@ export const init = new Command()
     process.cwd(),
   )
   .option("-s, --silent", "mute output.", false)
-  .action(async (_components, opts) => {
+  .action(async (opts) => {
     const options = initOptionsSchema.parse({
       baseColor: opts.baseColor,
       yes: Boolean(opts.yes),

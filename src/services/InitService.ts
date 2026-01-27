@@ -3,26 +3,26 @@ import type {
   PackageManager,
   VelarTheme,
   FileInfo,
-} from "../types/index.js";
-import type { IFileSystemService } from "../types/interfaces.js";
-import { isLaravelProject } from "../utils/laravel.js";
-import { readPackageJson, detectTailwindV4 } from "../utils/tailwind.js";
+} from "../types/index";
+import type { IFileSystemService } from "../types/interfaces";
+import { isLaravelProject } from "../utils/laravel";
+import { readPackageJson, detectTailwindV4 } from "../utils/tailwind";
 import {
   hasAlpineJs,
   hasLivewire,
   hasInteractivitySupport,
-} from "../utils/requirements.js";
-import { detectPackageManager } from "../utils/package-manager.js";
+} from "../utils/requirements";
+import { detectPackageManager } from "../utils/package-manager";
 import {
   findMainCss,
   hasTailwindImport,
   injectVelarImport,
-} from "../utils/css.js";
-import { findMainJs } from "../utils/js.js";
-import { copyTheme } from "../utils/theme.js";
-import { writeVelarConfig } from "../utils/config.js";
+} from "../utils/css";
+import { findMainJs } from "../utils/js";
+import { copyTheme } from "../utils/theme";
+import { writeVelarConfig } from "../utils/config";
 import fs from "fs";
-import { logger } from "../utils/logger.js";
+import { logger } from "../utils/logger";
 
 /**
  * Environment validation result

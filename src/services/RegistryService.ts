@@ -2,17 +2,17 @@ import type {
   GitHubFile,
   RegistryData,
   VelarComponentMeta,
-} from "../types/index.js";
-import type { IRegistryService } from "../types/interfaces.js";
+} from "../types/index";
+import type { IRegistryService } from "../types/interfaces";
 import {
   fetchComponent,
   fetchComponentFile,
   fetchGitHubRegistry,
-} from "../utils/remote-registry.js";
+} from "../utils/remote-registry";
 
-import { HttpService } from "./HttpService.js";
+import { HttpService } from "./HttpService";
 
-import { spinner } from "../utils/spinner.js";
+import { spinner } from "../utils/spinner";
 
 /**
  * Service for interacting with the Velar component registry

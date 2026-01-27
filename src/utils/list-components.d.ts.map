@@ -1,1 +1,0 @@
-{"version":3,"file":"list-components.d.ts","sourceRoot":"","sources":["list-components.ts"],"names":[],"mappings":"AAMA,MAAM,MAAM,WAAW,GAAG;IACxB,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,KAAK,CAAC,EAAE,MAAM,CAAC;IACf,MAAM,CAAC,EAAE,MAAM,CAAC;IAChB,IAAI,EAAE,OAAO,CAAC;CACf,CAAC;AAsCF,wBAAsB,cAAc,CAAC,OAAO,EAAE,WAAW,GAAG,OAAO,CAAC,IAAI,CAAC,CA6DxE"}

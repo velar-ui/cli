@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { FileInfo } from "../types/index.js";
+import type { FileInfo } from "../types/index";
 
 /**
  * Common JS file paths to check for main script
@@ -60,7 +60,7 @@ export function injectComponentJs(
 
   // Handle Alpine.data registration
   const alpineDataRegistration = `Alpine.data('${componentName}', ${componentName});`;
-  
+
   if (content.includes("document.addEventListener('alpine:init'")) {
     // Inject into existing listener
     if (!content.includes(alpineDataRegistration)) {

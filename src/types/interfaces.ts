@@ -1,4 +1,4 @@
-import type { VelarComponentMeta } from "./index.js";
+import type { VelarComponentMeta } from "./index";
 
 /**
  * Interface for registry service operations
@@ -9,7 +9,7 @@ export interface IRegistryService {
    * @returns Promise resolving to registry data
    * @throws NetworkError if fetch fails
    */
-  fetchRegistry(): Promise<import("../types/index.js").RegistryData>;
+  fetchRegistry(): Promise<import("../types/index").RegistryData>;
 
   /**
    * Fetch metadata for a specific component
@@ -83,14 +83,14 @@ export interface IConfigManager {
    * @returns Promise resolving to configuration
    * @throws Error if configuration not found or invalid
    */
-  load(): Promise<import("../types/index.js").VelarConfig>;
+  load(): Promise<import("../types/index").VelarConfig>;
 
   /**
    * Get the package manager from config
    * @returns Package manager name
    * @throws Error if config not loaded
    */
-  getPackageManager(): import("../types/index.js").PackageManager;
+  getPackageManager(): import("../types/index").PackageManager;
 
   /**
    * Validate that configuration is loaded
@@ -124,5 +124,5 @@ export interface IConfigManager {
    * @returns Theme name
    * @throws Error if config not loaded
    */
-  getTheme(): import("../types/index.js").VelarTheme;
+  getTheme(): import("../types/index").VelarTheme;
 }

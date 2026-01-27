@@ -1,24 +1,76 @@
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
 import type { VelarTheme } from "@/src/types";
 
-/**
- * Available Velar themes
- */
-export const THEMES: readonly VelarTheme[] = [
-  "neutral",
-  "blue",
-  "green",
-  "orange",
-  "red",
-  "rose",
-  "violet",
-  "yellow",
-] as const;
+type BaseColor = {
+  name: VelarTheme;
+  label: string;
+  cssVars: {
+    light: Record<string, string>;
+    dark: Record<string, string>;
+  };
+};
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const REGISTRY_THEMES_DIR = path.resolve(__dirname, "../registry/themes");
+function findColorsDir(startDir: string): string {
+  let current = startDir;
+  for (let depth = 0; depth < 4; depth += 1) {
+    const distPath = path.join(current, "colors");
+    if (fs.existsSync(distPath)) {
+      return distPath;
+    }
+
+    const srcPath = path.join(current, "src/colors");
+    if (fs.existsSync(srcPath)) {
+      return srcPath;
+    }
+
+    const parent = path.dirname(current);
+    if (parent === current) {
+      break;
+    }
+    current = parent;
+  }
+
+  return path.join(startDir, "colors");
+}
+
+const entryDir = process.argv[1]
+  ? path.dirname(path.resolve(process.argv[1]))
+  : process.cwd();
+const COLORS_DIR = findColorsDir(entryDir);
+
+function loadBaseColors(): BaseColor[] {
+  if (!fs.existsSync(COLORS_DIR)) {
+    return [];
+  }
+
+  const files = fs
+    .readdirSync(COLORS_DIR)
+    .filter((file) => file.endsWith(".json"));
+
+  return files
+    .map((file) => {
+      const filePath = path.join(COLORS_DIR, file);
+      const raw = fs.readFileSync(filePath, "utf-8");
+      return JSON.parse(raw) as BaseColor;
+    })
+    .filter((color) => !!color?.name)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export function getBaseColors(): BaseColor[] {
+  return loadBaseColors();
+}
+
+export function getBaseColor(name: VelarTheme): BaseColor | undefined {
+  return loadBaseColors().find((color) => color.name === name);
+}
+
+function renderCssVars(vars: Record<string, string>): string[] {
+  return Object.entries(vars).map(
+    ([key, value]) => `  --${key}: ${value};`,
+  );
+}
 
 /**
  * Copy a theme CSS file to the target location
@@ -27,9 +79,24 @@ const REGISTRY_THEMES_DIR = path.resolve(__dirname, "../registry/themes");
  * @throws Error if theme doesn't exist or copy fails
  */
 export function copyTheme(theme: VelarTheme, target: string): void {
-  const source = path.join(REGISTRY_THEMES_DIR, `${theme}.css`);
-  if (!fs.existsSync(source)) {
-    throw new Error(`Theme "${theme}" not found in registry.`);
+  const baseColor = getBaseColor(theme);
+  if (!baseColor) {
+    throw new Error(`Theme "${theme}" not found in colors registry.`);
   }
-  fs.copyFileSync(source, target, fs.constants.COPYFILE_EXCL);
+
+  const lightVars = renderCssVars(baseColor.cssVars.light);
+  const darkVars = renderCssVars(baseColor.cssVars.dark);
+
+  const content = [
+    ":root {",
+    ...lightVars,
+    "}",
+    "",
+    ".dark {",
+    ...darkVars,
+    "}",
+    "",
+  ].join("\n");
+
+  fs.writeFileSync(target, content, { encoding: "utf-8", flag: "wx" });
 }

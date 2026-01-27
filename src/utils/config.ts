@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { VelarConfig } from "../types/index.js";
+import type { VelarConfig } from "../types/index";
 
 /**
  * Write Velar configuration to velar.json file

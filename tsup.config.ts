@@ -16,5 +16,6 @@ export default defineConfig({
       recursive: true,
       force: true,
     });
+    cpSync("src/colors", "dist/colors", { recursive: true, force: true });
   },
 });

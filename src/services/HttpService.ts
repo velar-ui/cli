@@ -1,5 +1,5 @@
-import { NetworkError } from "../errors/errors.js";
-import type { FetchOptions } from "../types/index.js";
+import { NetworkError } from "../errors/errors";
+import type { FetchOptions } from "../types/index";
 
 /**
  * Default retry options

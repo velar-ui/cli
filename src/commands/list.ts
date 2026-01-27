@@ -1,84 +1,50 @@
-import chalk from "chalk";
 import { Command } from "commander";
-import Table from "cli-table3";
-import { ConfigManager } from "../config/ConfigManager.js";
-import { ErrorHandler } from "../errors/ErrorHandler.js";
-import { FileSystemService } from "../services/FileSystemService.js";
-import { RegistryService } from "../services/RegistryService.js";
-import { ListService } from "../services/ListService.js";
-import { logger } from "../utils/logger.js";
+import { z } from "zod";
+import path from "path";
+import { listComponents } from "@/src/utils/list-components";
+import { ErrorHandler } from "@/src/errors/ErrorHandler";
 
-/**
- * Register the 'list' command with the CLI program
- * @param program - Commander program instance
- */
-export default function registerListCommand(program: Command): void {
-  program
-    .command("list")
-    .description("List available UI components from the registry")
-    .action(async () => {
-      const errorHandler = new ErrorHandler();
+const listOptionsSchema = z.object({
+  cwd: z.string(),
+  query: z.string().optional(),
+  limit: z.number().optional(),
+  offset: z.number().optional(),
+  json: z.boolean(),
+});
 
-      try {
-        // 1. Initialize services
-        const registryService = new RegistryService();
-        const configManager = new ConfigManager();
-        const fileSystem = new FileSystemService();
-        const listService = new ListService(
-          registryService,
-          configManager,
-          fileSystem,
-        );
+export const list = new Command()
+  .name("list")
+  .alias("search")
+  .description("List or search components from the registry")
+  .option(
+    "-c, --cwd <cwd>",
+    "the working directory. defaults to the current directory.",
+    process.cwd(),
+  )
+  .option("-q, --query <query>", "query string")
+  .option(
+    "-l, --limit <number>",
+    "maximum number of items to display",
+    undefined,
+  )
+  .option("-o, --offset <number>", "number of items to skip", undefined)
+  .option("--json", "output JSON", false)
+  .action(async (opts) => {
+    const errorHandler = new ErrorHandler();
 
-        // 2. Fetch registry (spinner handle inside registryService)
-        const registry = await listService.fetchRegistry();
+    try {
+      const options = listOptionsSchema.parse({
+        cwd: path.resolve(opts.cwd),
+        query: opts.query,
+        limit: opts.limit ? Number.parseInt(opts.limit, 10) : undefined,
+        offset: opts.offset ? Number.parseInt(opts.offset, 10) : undefined,
+        json: Boolean(opts.json),
+      });
 
-        if (registry.components.length === 0) {
-          logger.warning("No components found in the registry.");
-          return;
-        }
-
-        console.log(chalk.bold("\nAvailable components:"));
-        console.log("");
-
-        const sortedComponents = listService.sortComponents(registry.components);
-
-        const table = new Table({
-          head: [
-            chalk.bold("Component"),
-            chalk.bold("Status"),
-            chalk.bold("Description"),
-          ],
-          colWidths: [20, 15, 50],
-          wordWrap: true,
-          style: {
-            head: [],
-            border: [],
-          },
-        });
-
-        for (const component of sortedComponents) {
-          const isInstalled = await listService.isComponentInstalled(component);
-          const status = isInstalled
-            ? chalk.green("Installed")
-            : chalk.gray("-");
-
-          table.push([
-            chalk.cyan(component.name),
-            status,
-            chalk.white(component.description || "No description"),
-          ]);
-        }
-
-        console.log(table.toString());
-
-        console.log("");
-        logger.info(
-          `Run ${chalk.green("velar add <component>")} to add a component to your project.`,
-        );
-      } catch (error) {
-        errorHandler.handle(error as Error, "list command");
-        process.exit(1);
-      }
-    });
-}
+      process.chdir(options.cwd);
+      await listComponents(options);
+    } catch (error) {
+      errorHandler.handle(error as Error, "list command");
+      process.exit(1);
+    }
+  });

@@ -2,8 +2,9 @@ import chalk from "chalk";
 import { Command } from "commander";
 import { init } from "@/src/commands/init";
 import { add } from "@/src/commands/add";
-import { search } from "@/src/commands/list";
+import { list } from "@/src/commands/list";
 
+import packageJson from "../package.json";
 /**
  * Display a nice introduction banner
  */
@@ -21,7 +22,11 @@ const program = new Command();
 program
   .name("velar")
   .description("Velar CLI: Copy UI components into your Laravel project")
-  .version("0.1.0")
+  .version(
+    packageJson.version || "1.0.0",
+    "-v, --version",
+    "display the version number",
+  )
   .hook("preAction", () => {
     displayIntro();
   });
@@ -29,6 +34,6 @@ program
 program
   .addCommand(add)
   .addCommand(init)
-  .addCommand(search);
+  .addCommand(list);
 
 program.parse(process.argv);

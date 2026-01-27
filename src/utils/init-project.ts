@@ -1,7 +1,7 @@
 import prompts from "prompts";
 import { FileSystemService } from "@/src/services/FileSystemService";
 import { InitService } from "@/src/services/InitService";
-import { THEMES } from "@/src/utils/theme";
+import { getBaseColors } from "@/src/utils/theme";
 import { logger } from "@/src/utils/logger";
 import { highlighter } from "@/src/utils/highlighter";
 import type { PackageManager, VelarTheme } from "@/src/types";
@@ -46,14 +46,19 @@ async function promptPackageManager(
 }
 
 async function promptTheme(): Promise<VelarTheme> {
+  const baseColors = getBaseColors();
+  if (baseColors.length === 0) {
+    logger.error("No base colors available.");
+    process.exit(1);
+  }
   const { theme } = await prompts(
     {
       type: "select",
       name: "theme",
       message: "Choose a base color theme",
-      choices: THEMES.map((t) => ({
-        title: t.charAt(0).toUpperCase() + t.slice(1),
-        value: t,
+      choices: baseColors.map((color) => ({
+        title: color.label,
+        value: color.name,
       })),
     },
     {
@@ -88,8 +93,10 @@ function resolveThemeFromOptions(options: InitOptions): VelarTheme | undefined {
     return undefined;
   }
 
-  if ((THEMES as readonly string[]).includes(options.baseColor)) {
-    return options.baseColor as VelarTheme;
+  const baseColors = getBaseColors();
+  const matched = baseColors.find((color) => color.name === options.baseColor);
+  if (matched) {
+    return matched.name;
   }
 
   logger.warn(`Unknown base color "${options.baseColor}".`);
@@ -110,9 +117,20 @@ export async function initProject(options: InitOptions): Promise<void> {
       ? validation.detectedPackageManager
       : await promptPackageManager(validation.detectedPackageManager);
 
+    const baseColors = getBaseColors();
+    const defaultTheme =
+      baseColors.find((color) => color.name === "neutral")?.name ??
+      baseColors[0]?.name;
+
     let theme = resolveThemeFromOptions(options);
     if (!theme) {
-      theme = options.defaults ? THEMES[0] : await promptTheme();
+      theme =
+        options.defaults && defaultTheme ? defaultTheme : await promptTheme();
+    }
+
+    if (!theme) {
+      logger.error("No base color available.");
+      process.exit(1);
     }
 
     await initService.createComponentsDirectory();

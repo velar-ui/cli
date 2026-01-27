@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { PackageManager } from "../types/index.js";
+import type { PackageManager } from "../types/index";
 
 /**
  * Detect the package manager used in the project

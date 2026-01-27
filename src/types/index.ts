@@ -11,15 +11,7 @@ export type PackageManager = "npm" | "yarn" | "pnpm" | "bun";
 /**
  * Available color themes
  */
-export type VelarTheme =
-  | "neutral"
-  | "blue"
-  | "green"
-  | "orange"
-  | "red"
-  | "rose"
-  | "violet"
-  | "yellow";
+export type VelarTheme = "neutral" | "gray" | "slate" | "stone" | "zinc";
 
 /**
  * Represents a file in a Velar component
