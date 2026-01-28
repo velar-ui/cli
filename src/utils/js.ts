@@ -1,5 +1,5 @@
 import fs from "fs";
-import type { FileInfo } from "../types/index";
+import type { FileInfo } from "@/src/types";
 
 /**
  * Common JS file paths to check for main script
