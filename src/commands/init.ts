@@ -2,6 +2,7 @@ import { Command } from "commander";
 import path from "path";
 import { deleteFileBackup, restoreFileBackup } from "@/src/utils/file-helper";
 import { initOptionsSchema, initProject } from "@/src/utils/init-project";
+import { preFlightInit } from "@/src/preflights/preflight-init";
 
 process.on("exit", (code) => {
   const filePath = path.resolve(process.cwd(), "velar.json");

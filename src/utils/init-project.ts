@@ -1,6 +1,10 @@
 import prompts from "prompts";
 import { FileSystemService } from "@/src/services/FileSystemService";
 import { InitService } from "@/src/services/InitService";
+import {
+  preFlightInit,
+  type ProjectInfo,
+} from "@/src/preflights/preflight-init";
 import { getBaseColors } from "@/src/utils/theme";
 import { logger } from "@/src/utils/logger";
 import { highlighter } from "@/src/utils/highlighter";
@@ -103,7 +107,16 @@ function resolveThemeFromOptions(options: InitOptions): VelarTheme | undefined {
   return undefined;
 }
 
-export async function initProject(options: InitOptions): Promise<void> {
+export async function initProject(
+  options: InitOptions,
+  projectInfo?: ProjectInfo | null,
+): Promise<void> {
+  // Use provided projectInfo or run preflight checks
+  if (!projectInfo) {
+    const preflight = await preFlightInit(options);
+    projectInfo = preflight.projectInfo;
+  }
+
   process.chdir(options.cwd);
 
   const fileSystem = new FileSystemService();

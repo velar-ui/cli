@@ -3,7 +3,7 @@ import type {
   PackageManager,
   VelarTheme,
   FileInfo,
-} from "../types/index";
+} from "@/src/types";
 import type { IFileSystemService } from "../types/interfaces";
 import { isLaravelProject } from "../utils/laravel";
 import { readPackageJson, detectTailwindV4 } from "../utils/tailwind";
@@ -23,6 +23,7 @@ import { copyTheme } from "../utils/theme";
 import { writeVelarConfig } from "../utils/config";
 import fs from "fs";
 import { logger } from "../utils/logger";
+import packageJson from "../../package.json";
 
 /**
  * Environment validation result
@@ -208,7 +209,7 @@ export class InitService {
     validation: EnvironmentValidation,
   ): Promise<void> {
     const config: VelarConfig = {
-      version: "0.1",
+      version: packageJson.version as string,
       theme: options.theme,
       packageManager: options.packageManager,
       css: {

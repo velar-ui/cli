@@ -14,7 +14,7 @@ export type AddOptions = {
   path?: string;
   silent: boolean;
   srcDir?: boolean;
-  cssVariables: boolean;
+  cssVariables?: boolean;
 };
 
 async function promptForRegistryComponents(

@@ -14,7 +14,7 @@ export const addOptionsSchema = z.object({
   path: z.string().optional(),
   silent: z.boolean(),
   srcDir: z.boolean().optional(),
-  cssVariables: z.boolean(),
+  cssVariables: z.boolean().optional(),
 });
 
 /**
@@ -43,16 +43,21 @@ export const add = new Command()
     "--no-src-dir",
     "do not use the src directory when creating a new project.",
   )
+  .option("--css-variables", "use CSS variables for theming.", true)
+  .option("--no-css-variables", "do not use CSS variables for theming.")
   .description("Add one or more UI components to your Laravel project")
   .action(async (components, opts) => {
     const errorHandler = new ErrorHandler();
 
     try {
-      const options = addOptionsSchema.parse({
+      const rawOptions = {
         components,
         cwd: path.resolve(opts.cwd),
         ...opts,
-      });
+        cssVariables: opts.cssVariables ?? true,
+      };
+
+      const options = addOptionsSchema.parse(rawOptions);
       await addComponents(options);
     } catch (error) {
       errorHandler.handle(error as Error, "add command");

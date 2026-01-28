@@ -1,6 +1,6 @@
 {
   "name": "velar-ui",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "CLI to add composable UI components to Laravel projects",
   "publishConfig": {
     "access": "public"
@@ -28,11 +28,18 @@
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup",
+    "start": "node dist/index.js",
     "lint": "eslint .",
     "prepublishOnly": "pnpm run build",
-    "format": "prettier --write .",
+    "format:write": "prettier --write \"**/*.{ts,tsx,mdx}\" --cache",
+    "format:check": "prettier --check \"**/*.{ts,tsx,mdx}\" --cache",
+    "release": "changeset version",
+    "pub:beta": "pnpm build && pnpm publish --no-git-checks --access public --tag beta",
+    "pub:next": "pnpm build && pnpm publish --no-git-checks --access public --tag next",
+    "pub:release": "pnpm build && pnpm publish --access public",
     "check:ci": "pnpm run lint && pnpm run typecheck",
     "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
@@ -70,6 +77,7 @@
     "globals": "^17.0.0",
     "jiti": "^2.6.1",
     "prettier": "3.8.0",
+    "rimraf": "^6.0.1",
     "tsc-alias": "^1.8.16",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
