@@ -1,6 +1,6 @@
 import { getGitHubRegistryUrl } from "./environment";
 import { NetworkError, ComponentNotFoundError } from "../errors/errors";
-import { HttpService } from "../services/HttpService";
+import { HttpService } from "../services/http-service";
 import type {
   GitHubFile,
   RegistryData,

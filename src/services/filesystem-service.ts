@@ -5,7 +5,7 @@ import type { IFileSystemService } from "../types/interfaces";
 /**
  * Service for file system operations
  */
-export class FileSystemService implements IFileSystemService {
+export class FilesystemService implements IFileSystemService {
   /**
    * Check if a file exists
    * @param filePath - Path to check

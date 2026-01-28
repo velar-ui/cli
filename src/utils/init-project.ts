@@ -1,10 +1,7 @@
 import prompts from "prompts";
-import { FileSystemService } from "@/src/services/FileSystemService";
-import { InitService } from "@/src/services/InitService";
-import {
-  preFlightInit,
-  type ProjectInfo,
-} from "@/src/preflights/preflight-init";
+import { FilesystemService } from "@/src/services/filesystem-service";
+import { InitService } from "@/src/services/init-service";
+import { preFlightInit, type ProjectInfo } from "@/src/utils/preflight-init";
 import { getBaseColors } from "@/src/utils/theme";
 import { logger } from "@/src/utils/logger";
 import { highlighter } from "@/src/utils/highlighter";
@@ -119,7 +116,7 @@ export async function initProject(
 
   process.chdir(options.cwd);
 
-  const fileSystem = new FileSystemService();
+  const fileSystem = new FilesystemService();
   const initService = new InitService(fileSystem);
 
   try {

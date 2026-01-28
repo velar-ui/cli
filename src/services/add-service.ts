@@ -1,8 +1,8 @@
-import type { AddResult, RegistryData } from "../types/index";
+import type { AddResult, RegistryData } from "@/src/types";
 import type { IRegistryService } from "../types/interfaces";
 import type { IConfigManager } from "../types/interfaces";
-import { ComponentService } from "./ComponentService";
-import { FileSystemService } from "./FileSystemService";
+import { ComponentService } from "./component-service";
+import { FilesystemService } from "./filesystem-service";
 import { logger } from "../utils/logger";
 
 /**
@@ -28,7 +28,7 @@ export class AddService {
       componentService ??
       new ComponentService(
         registryService,
-        new FileSystemService(),
+        new FilesystemService(),
         configManager,
       );
   }
@@ -100,12 +100,12 @@ export class AddService {
       return;
     }
 
-    console.log("\nNext steps:");
-    console.log("  Use <x-ui.COMPONENT> in your Blade views");
+    console.log("\n🎉 Happy coding! Enjoy building beautiful components!");
 
     // Check if JS files were added but not auto-imported
     const jsFiles = result.added.filter((name) => name.endsWith(".js"));
-    const hasJsEntry = this.configManager.validate() && this.configManager.getJsEntryPath();
+    const hasJsEntry =
+      this.configManager.validate() && this.configManager.getJsEntryPath();
 
     if (jsFiles.length > 0 && !hasJsEntry) {
       console.log("  Import JS files in your app.js:");

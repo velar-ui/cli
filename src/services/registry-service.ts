@@ -10,7 +10,7 @@ import {
   fetchGitHubRegistry,
 } from "../utils/remote-registry";
 
-import { HttpService } from "./HttpService";
+import { HttpService } from "./http-service";
 
 import { spinner } from "../utils/spinner";
 

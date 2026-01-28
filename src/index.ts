@@ -31,9 +31,6 @@ program
     displayIntro();
   });
 
-program
-  .addCommand(add)
-  .addCommand(init)
-  .addCommand(list);
+program.addCommand(add).addCommand(init).addCommand(list);
 
 program.parse(process.argv);

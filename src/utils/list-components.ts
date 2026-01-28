@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import Table from "cli-table3";
 import type { VelarComponentMeta } from "@/src/types";
-import { RegistryService } from "@/src/services/RegistryService";
+import { RegistryService } from "@/src/services/registry-service";
 import { logger } from "@/src/utils/logger";
 
 export type ListOptions = {

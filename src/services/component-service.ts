@@ -12,7 +12,7 @@ import type {
   IFileSystemService,
   IRegistryService,
 } from "@/src/types/interfaces";
-import { FileSystemService } from "@/src/services/FileSystemService";
+import { FilesystemService } from "@/src/services/filesystem-service";
 import { injectComponentJs } from "@/src/utils/js";
 import { logger } from "@/src/utils/logger";
 import {
@@ -47,7 +47,7 @@ export class ComponentService {
     fileSystem?: IFileSystemService,
     private readonly configManager?: IConfigManager,
   ) {
-    this.fileSystem = fileSystem ?? new FileSystemService();
+    this.fileSystem = fileSystem ?? new FilesystemService();
     if (!this.configManager) {
       throw new Error("ConfigManager is required");
     }

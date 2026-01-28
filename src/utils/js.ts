@@ -42,7 +42,10 @@ export function injectComponentJs(
 
   // Avoid duplicate imports
   const importStatement = `import ${componentName} from '${componentImportPath}'`;
-  if (content.includes(importStatement) || content.includes(`import ${componentName} from "${componentImportPath}"`)) {
+  if (
+    content.includes(importStatement) ||
+    content.includes(`import ${componentName} from "${componentImportPath}"`)
+  ) {
     return;
   }
 
@@ -66,7 +69,7 @@ export function injectComponentJs(
     if (!content.includes(alpineDataRegistration)) {
       content = content.replace(
         /document\.addEventListener\('alpine:init',\s*\(\)\s*=>\s*\{/,
-        (match) => `${match}\n    ${alpineDataRegistration}`
+        (match) => `${match}\n    ${alpineDataRegistration}`,
       );
     }
   } else {

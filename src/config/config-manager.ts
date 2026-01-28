@@ -1,8 +1,4 @@
-import type {
-  VelarConfig,
-  PackageManager,
-  VelarTheme,
-} from "@/src/types";
+import type { VelarConfig, PackageManager, VelarTheme } from "@/src/types";
 import type { IConfigManager } from "@/src/types/interfaces";
 import { readVelarConfig } from "@/src/utils/config";
 import { logger } from "@/src/utils/logger";

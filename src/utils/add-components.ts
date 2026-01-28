@@ -1,6 +1,6 @@
-import { ConfigManager } from "@/src/config/ConfigManager";
-import { AddService } from "@/src/services/AddService";
-import { RegistryService } from "@/src/services/RegistryService";
+import { ConfigManager } from "@/src/config/config-manager";
+import { AddService } from "@/src/services/add-service";
+import { RegistryService } from "@/src/services/registry-service";
 import { logger } from "@/src/utils/logger";
 import { z } from "zod";
 import prompts from "prompts";

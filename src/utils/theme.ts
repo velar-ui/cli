@@ -67,9 +67,7 @@ export function getBaseColor(name: VelarTheme): BaseColor | undefined {
 }
 
 function renderCssVars(vars: Record<string, string>): string[] {
-  return Object.entries(vars).map(
-    ([key, value]) => `  --${key}: ${value};`,
-  );
+  return Object.entries(vars).map(([key, value]) => `  --${key}: ${value};`);
 }
 
 /**
