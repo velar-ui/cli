@@ -8,7 +8,9 @@
   "engines": {
     "node": ">=20"
   },
-  "bin": "./dist/index.js",
+  "bin": {
+    "velar": "./dist/index.js"
+  },
   "files": [
     "dist"
   ],
