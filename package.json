@@ -1,5 +1,5 @@
 {
-  "name": "velar-ui",
+  "name": "@velar/cli",
   "version": "1.0.0",
   "description": "CLI to add composable UI components to Laravel projects",
   "author": "",
