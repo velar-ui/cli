@@ -1,10 +1,16 @@
+import { exec } from 'child_process'
 import path from 'path'
 import fs from 'fs-extra'
+import { promisify } from 'util'
 import { highlighter } from '@/src/utils/highlighter'
 import { logger } from '@/src/utils/logger'
 import { spinner } from '@/src/utils/spinner'
 import prompts from 'prompts'
+import { detectPackageManager } from '@/src/utils/package-manager'
 import type { InitOptions } from '@/src/utils/init-project'
+import type { PackageManager } from '@/src/types'
+
+const execAsync = promisify(exec)
 
 export interface ProjectInfo {
   name: string
@@ -14,8 +20,8 @@ export interface ProjectInfo {
     version?: string
   }
   hasAlpine: boolean
-  hasLivewire: boolean
   hasVite: boolean
+  packageManager: PackageManager
   paths: {
     views: string
     assets: string
@@ -29,7 +35,6 @@ export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
     const composerPath = path.resolve(cwd, 'composer.json')
     const packagePath = path.resolve(cwd, 'package.json')
 
-    // Vérifier si c'est un projet Laravel
     if (!fs.existsSync(composerPath)) {
       return null
     }
@@ -43,6 +48,13 @@ export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
       return null
     }
 
+    // Détecter le package manager
+    const originalDir = process.cwd()
+    process.chdir(cwd)
+    const pkgManager = detectPackageManager()
+    console.log(`Detected package manager: ${pkgManager}`)
+    process.chdir(originalDir)
+
     const projectInfo: ProjectInfo = {
       name: composer.name || path.basename(cwd),
       framework: {
@@ -51,8 +63,8 @@ export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
         version: composer.require?.['laravel/framework'] || 'unknown',
       },
       hasAlpine: false,
-      hasLivewire: false,
       hasVite: false,
+      packageManager: pkgManager,
       paths: {
         views: 'resources/views',
         assets: 'resources/js',
@@ -66,9 +78,6 @@ export async function getProjectInfo(cwd: string): Promise<ProjectInfo | null> {
       const pkg = await fs.readJson(packagePath)
       projectInfo.hasAlpine = !!(
         pkg.dependencies?.alpinejs || pkg.devDependencies?.alpinejs
-      )
-      projectInfo.hasLivewire = !!(
-        pkg.dependencies?.livewire || pkg.devDependencies?.livewire
       )
       projectInfo.hasVite = !!pkg.devDependencies?.vite
     }
@@ -170,8 +179,49 @@ export async function preFlightInit(options: InitOptions): Promise<{
   const alpineSpinner = spinner.start('Checking Alpine.js...')
 
   if (!projectInfo.hasAlpine) {
-    errors['ALPINE_MISSING'] = true
     alpineSpinner.fail()
+    logger.break()
+    logger.warn(`Alpine.js is required but not found in your project.`)
+
+    // Proposer d'installer Alpine.js directement
+    const { installAlpine } = await prompts({
+      type: 'confirm',
+      name: 'installAlpine',
+      message: 'Would you like to install Alpine.js now?',
+      initial: true,
+    })
+
+    if (installAlpine) {
+      // Installer Alpine.js avec le package manager détecté
+      const pkgManager = projectInfo.packageManager
+      const installSpinner = spinner.start(
+        `Installing Alpine.js with ${pkgManager}...`,
+      )
+
+      try {
+        await execAsync(`${pkgManager} install alpinejs`, {
+          cwd: options.cwd,
+        })
+        installSpinner.succeed('Alpine.js installed successfully')
+        projectInfo.hasAlpine = true
+      } catch (error) {
+        installSpinner.fail(
+          `Failed to install Alpine.js: ${(error as Error).message}`,
+        )
+        logger.error(
+          `Please install Alpine.js manually: ${highlighter.info(`${pkgManager} install alpinejs`)}`,
+        )
+        logger.break()
+        process.exit(1)
+      }
+    } else {
+      const pkgManager = projectInfo.packageManager
+      logger.error(
+        `Alpine.js is required. Install it with: ${highlighter.info(`${pkgManager} install alpinejs`)}`,
+      )
+      logger.break()
+      process.exit(1)
+    }
   } else {
     alpineSpinner.succeed('Alpine.js found')
   }
@@ -190,15 +240,6 @@ export async function preFlightInit(options: InitOptions): Promise<{
 
   // Afficher les erreurs bloquantes
   if (Object.keys(errors).length > 0) {
-    if (errors['ALPINE_MISSING']) {
-      logger.break()
-      logger.error(`Alpine.js is required but not found in your project.`)
-      logger.error(
-        `Install Alpine.js with: ${highlighter.info('npm install alpinejs')}`,
-      )
-      logger.break()
-    }
-
     logger.break()
     process.exit(1)
   }

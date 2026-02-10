@@ -52,43 +52,9 @@ export function hasAlpineInLayouts(): boolean {
 }
 
 /**
- * Check if Livewire is installed via Composer
- * @returns True if Livewire is found in composer.json
- */
-export function hasLivewire(): boolean {
-  try {
-    const composer = JSON.parse(fs.readFileSync('composer.json', 'utf8')) as {
-      require?: Readonly<Record<string, string>>
-      'require-dev'?: Readonly<Record<string, string>>
-    }
-    const hasInRequire =
-      composer.require &&
-      Object.keys(composer.require).some((dep) =>
-        dep.toLowerCase().includes('livewire'),
-      )
-    const hasInRequireDev =
-      composer['require-dev'] &&
-      Object.keys(composer['require-dev']).some((dep) =>
-        dep.toLowerCase().includes('livewire'),
-      )
-    return Boolean(hasInRequire || hasInRequireDev)
-  } catch {
-    return false
-  }
-}
-
-/**
  * Check if Alpine.js is available in the project
  * @returns True if Alpine.js is detected
  */
 export function hasAlpineJs(): boolean {
   return hasAlpineInPackageJson() || hasAlpineInLayouts()
-}
-
-/**
- * Check if project has interactivity support (Alpine.js or Livewire)
- * @returns True if interactivity framework is detected
- */
-export function hasInteractivitySupport(): boolean {
-  return hasAlpineJs() || hasLivewire()
 }

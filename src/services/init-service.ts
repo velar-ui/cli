@@ -7,11 +7,7 @@ import type {
 import type { IFileSystemService } from '../types/interfaces'
 import { isLaravelProject } from '../utils/laravel'
 import { readPackageJson, detectTailwindV4 } from '../utils/tailwind'
-import {
-  hasAlpineJs,
-  hasLivewire,
-  hasInteractivitySupport,
-} from '../utils/requirements'
+import { hasAlpineJs } from '../utils/requirements'
 import { detectPackageManager } from '../utils/package-manager'
 import { findMainCss, hasTailwindImport, injectVelarImport } from '../utils/css'
 import { findMainJs } from '../utils/js'
@@ -31,8 +27,6 @@ export interface EnvironmentValidation {
   hasTailwindV4: boolean
   /** Whether Alpine.js is detected */
   hasAlpine: boolean
-  /** Whether Livewire is detected */
-  hasLivewire: boolean
   /** Detected package manager */
   detectedPackageManager: PackageManager
   /** Main CSS file info if found */
@@ -84,7 +78,6 @@ export class InitService {
 
     // Check interactivity frameworks
     const hasAlpine = hasAlpineJs()
-    const hasLivewireSupport = hasLivewire()
     const detectedPm = detectPackageManager()
 
     // Find CSS and JS files
@@ -96,7 +89,6 @@ export class InitService {
       isLaravel: true,
       hasTailwindV4: true,
       hasAlpine,
-      hasLivewire: hasLivewireSupport,
       detectedPackageManager: detectedPm,
       cssFile: css,
       jsFile: js,
@@ -110,19 +102,15 @@ export class InitService {
    */
   displayEnvironmentInfo(validation: EnvironmentValidation): void {
     // Display interactivity framework status
-    if (!hasInteractivitySupport()) {
-      logger.warn('No interactivity framework detected')
-      logger.log('Velar components work best with Alpine.js or Livewire')
+    if (!validation.hasAlpine) {
+      logger.warn('Alpine.js not detected')
       logger.log(
         `Install Alpine.js: ${validation.detectedPackageManager} install alpinejs`,
       )
-      logger.log('Or install Livewire: composer require livewire/livewire')
-    } else if (validation.hasAlpine) {
+    } else {
       logger.success(
         'Alpine.js detected - components will be fully interactive',
       )
-    } else if (validation.hasLivewire) {
-      logger.success('Livewire detected - components will work with Livewire')
     }
 
     // Display CSS file status
