@@ -5,7 +5,7 @@ import { preFlightInit, type ProjectInfo } from '@/src/utils/preflight-init'
 import { getBaseColors } from '@/src/utils/theme'
 import { logger } from '@/src/utils/logger'
 import { highlighter } from '@/src/utils/highlighter'
-import type { PackageManager, VelarTheme } from '@/src/types'
+import type { VelarTheme } from '@/src/types'
 import { z } from 'zod'
 
 export const initOptionsSchema = z.object({
@@ -18,33 +18,6 @@ export const initOptionsSchema = z.object({
 })
 
 export type InitOptions = z.infer<typeof initOptionsSchema>
-
-async function promptPackageManager(
-  detectedPm: PackageManager,
-): Promise<PackageManager> {
-  const { packageManager } = await prompts(
-    {
-      type: 'select',
-      name: 'packageManager',
-      message: 'Which package manager are you using?',
-      choices: [
-        { title: 'npm', value: 'npm' },
-        { title: 'yarn', value: 'yarn' },
-        { title: 'pnpm', value: 'pnpm' },
-        { title: 'bun', value: 'bun' },
-      ],
-      initial: ['npm', 'yarn', 'pnpm', 'bun'].indexOf(detectedPm),
-    },
-    {
-      onCancel: () => {
-        logger.error('Package manager selection aborted')
-        process.exit(1)
-      },
-    },
-  )
-
-  return packageManager as PackageManager
-}
 
 async function promptTheme(): Promise<VelarTheme> {
   const baseColors = getBaseColors()
@@ -123,9 +96,8 @@ export async function initProject(
     const validation = initService.validateEnvironment()
     initService.displayEnvironmentInfo(validation)
 
-    const packageManager = options.defaults
-      ? validation.detectedPackageManager
-      : await promptPackageManager(validation.detectedPackageManager)
+    // Use the package manager already detected in preflight checks
+    const packageManager = projectInfo!.packageManager
 
     const baseColors = getBaseColors()
     const defaultTheme =

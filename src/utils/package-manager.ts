@@ -16,7 +16,7 @@ export function detectPackageManager(): PackageManager {
   if (fs.existsSync('package-lock.json')) {
     return 'npm'
   }
-  if (fs.existsSync('bun.lockb')) {
+  if (fs.existsSync('bun.lock')) {
     return 'bun'
   }
 

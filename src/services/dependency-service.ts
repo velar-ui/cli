@@ -8,6 +8,22 @@ import { FilesystemService } from './filesystem-service'
 const execAsync = promisify(exec)
 
 /**
+ * Convert npm-style dependency string to Composer format
+ * @param dep - Dependency string in npm format (e.g., "vendor/package@1.0.0")
+ * @returns Dependency string in Composer format (e.g., "vendor/package:1.0.0")
+ */
+function convertNpmToComposerFormat(dep: string): string {
+  // Replace @ with : for version constraint
+  // But only if it's not a scoped package (starting with @)
+  if (dep.startsWith('@')) {
+    // Scoped npm package like @alpinejs/alpinejs - return as-is for npm
+    return dep
+  }
+  // Replace @ with : for Composer packages
+  return dep.replace('@', ':')
+}
+
+/**
  * Service for managing dependency installation
  */
 export class DependencyService implements IDependencyService {
@@ -99,7 +115,7 @@ export class DependencyService implements IDependencyService {
 
   /**
    * Install composer dependencies
-   * @param dependencies - Array of dependency strings (e.g., "livewire/livewire:^3.0")
+   * @param dependencies - Array of dependency strings (e.g., "livewire/livewire:^3.0" or "livewire/livewire@^3.0")
    * @returns Promise that resolves when installation is complete
    */
   async installComposerDependencies(
@@ -110,8 +126,11 @@ export class DependencyService implements IDependencyService {
       return
     }
 
+    // Convert npm format (@) to Composer format (:) if needed
+    const convertedDeps = dependencies.map(convertNpmToComposerFormat)
+
     const missingDeps =
-      await this.filterMissingComposerDependencies(dependencies)
+      await this.filterMissingComposerDependencies(convertedDeps)
 
     if (missingDeps.length === 0) {
       logger.info('All composer dependencies already installed')
