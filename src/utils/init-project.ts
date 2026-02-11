@@ -5,7 +5,7 @@ import { preFlightInit, type ProjectInfo } from '@/src/utils/preflight-init'
 import { getBaseColors } from '@/src/utils/theme'
 import { logger } from '@/src/utils/logger'
 import { highlighter } from '@/src/utils/highlighter'
-import type { VelarTheme } from '@/src/types'
+import type { VelyxTheme } from '@/src/types'
 import { z } from 'zod'
 
 export const initOptionsSchema = z.object({
@@ -19,7 +19,7 @@ export const initOptionsSchema = z.object({
 
 export type InitOptions = z.infer<typeof initOptionsSchema>
 
-async function promptTheme(): Promise<VelarTheme> {
+async function promptTheme(): Promise<VelyxTheme> {
   const baseColors = getBaseColors()
   if (baseColors.length === 0) {
     logger.error('No base colors available.')
@@ -43,7 +43,7 @@ async function promptTheme(): Promise<VelarTheme> {
     },
   )
 
-  return theme as VelarTheme
+  return theme as VelyxTheme
 }
 
 async function promptStyleImport(): Promise<boolean> {
@@ -51,7 +51,7 @@ async function promptStyleImport(): Promise<boolean> {
     {
       type: 'confirm',
       name: 'shouldImport',
-      message: 'Import Velar styles into your main CSS file?',
+      message: 'Import Velyx styles into your main CSS file?',
       initial: true,
     },
     {
@@ -62,7 +62,7 @@ async function promptStyleImport(): Promise<boolean> {
   return Boolean(shouldImport)
 }
 
-function resolveThemeFromOptions(options: InitOptions): VelarTheme | undefined {
+function resolveThemeFromOptions(options: InitOptions): VelyxTheme | undefined {
   if (!options.baseColor) {
     return undefined
   }
@@ -148,9 +148,9 @@ export async function initProject(
     logger.error((error as Error).message)
     if (error instanceof Error) {
       if (error.message.includes('Laravel project')) {
-        logger.log('Run velar init at the root of a Laravel project')
+        logger.log('Run velyx init at the root of a Laravel project')
       } else if (error.message.includes('Tailwind')) {
-        logger.log(`Velar requires ${highlighter.info('Tailwind CSS v4+')}`)
+        logger.log(`Velyx requires ${highlighter.info('Tailwind CSS v4+')}`)
       }
     }
     process.exit(1)

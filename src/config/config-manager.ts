@@ -1,23 +1,23 @@
-import type { VelarConfig, PackageManager, VelarTheme } from '@/src/types'
+import type { VelyxConfig, PackageManager, VelyxTheme } from '@/src/types'
 import type { IConfigManager } from '@/src/types/interfaces'
-import { readVelarConfig } from '@/src/utils/config'
+import { readVelyxConfig } from '@/src/utils/config'
 import { logger } from '@/src/utils/logger'
 import { handleError } from '@/src/utils/handle-error'
 
 /**
- * Manages Velar configuration loading and access
+ * Manages Velyx configuration loading and access
  */
 export class ConfigManager implements IConfigManager {
-  private config?: VelarConfig
+  private config?: VelyxConfig
 
   /**
    * Load configuration from file
    * @returns Promise resolving to configuration
    * @throws Error if configuration not found or invalid
    */
-  async load(): Promise<VelarConfig> {
+  async load(): Promise<VelyxConfig> {
     try {
-      this.config = readVelarConfig()
+      this.config = readVelyxConfig()
       if (!this.config) {
         logger.error('')
         handleError(new Error('Configuration not found'))
@@ -72,7 +72,7 @@ export class ConfigManager implements IConfigManager {
     if (!this.config) {
       throw new Error('Configuration not loaded')
     }
-    return this.config.css.velar
+    return this.config.css.velyx
   }
 
   /**
@@ -92,10 +92,10 @@ export class ConfigManager implements IConfigManager {
    * @returns Theme name
    * @throws Error if config not loaded
    */
-  getTheme(): VelarTheme {
+  getTheme(): VelyxTheme {
     if (!this.config) {
       throw new Error('Configuration not loaded')
     }
-    return this.config.theme as VelarTheme
+    return this.config.theme as VelyxTheme
   }
 }

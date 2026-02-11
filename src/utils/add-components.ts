@@ -69,8 +69,8 @@ export async function addComponents(options: AddOptions): Promise<void> {
   try {
     addService.validateInitialization()
   } catch {
-    logger.error('Velar is not initialized')
-    logger.log('Run velar init first')
+    logger.error('Velyx is not initialized')
+    logger.log('Run velyx init first')
     process.exit(1)
   }
 
@@ -85,7 +85,7 @@ export async function addComponents(options: AddOptions): Promise<void> {
     addService.validateComponents(componentNames, registry)
   } catch (err) {
     logger.error((err as Error).message)
-    logger.log('Run velar list to see available components')
+    logger.log('Run velyx list to see available components')
     process.exit(1)
   }
 

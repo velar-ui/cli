@@ -4,7 +4,7 @@ import { deleteFileBackup, restoreFileBackup } from '@/src/utils/file-helper'
 import { initOptionsSchema, initProject } from '@/src/utils/init-project'
 
 process.on('exit', (code) => {
-  const filePath = path.resolve(process.cwd(), 'velar.json')
+  const filePath = path.resolve(process.cwd(), 'velyx.json')
 
   // Delete backup if successful.
   if (code === 0) {

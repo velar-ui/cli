@@ -1,7 +1,7 @@
 import type {
-  VelarConfig,
+  VelyxConfig,
   PackageManager,
-  VelarTheme,
+  VelyxTheme,
   FileInfo,
 } from '@/src/types'
 import type { IFileSystemService } from '../types/interfaces'
@@ -9,10 +9,10 @@ import { isLaravelProject } from '../utils/laravel'
 import { readPackageJson, detectTailwindV4 } from '../utils/tailwind'
 import { hasAlpineJs } from '../utils/requirements'
 import { detectPackageManager } from '../utils/package-manager'
-import { findMainCss, hasTailwindImport, injectVelarImport } from '../utils/css'
+import { findMainCss, hasTailwindImport, injectVelyxImport } from '../utils/css'
 import { findMainJs } from '../utils/js'
 import { copyTheme } from '../utils/theme'
-import { writeVelarConfig } from '../utils/config'
+import { writeVelyxConfig } from '../utils/config'
 import fs from 'fs'
 import { logger } from '../utils/logger'
 import packageJson from '../../package.json'
@@ -44,20 +44,20 @@ export interface InitOptions {
   /** Selected package manager */
   packageManager: PackageManager
   /** Selected theme */
-  theme: VelarTheme
+  theme: VelyxTheme
   /** Whether to import styles */
   importStyles: boolean
 }
 
 /**
- * Service for handling Velar initialization
+ * Service for handling Velyx initialization
  */
 export class InitService {
   /**
    * Create a new InitService instance
    * @param fileSystem - File system service
    */
-  constructor(private readonly fileSystem: IFileSystemService) {}
+  constructor(private readonly fileSystem: IFileSystemService) { }
 
   /**
    * Validate the project environment
@@ -119,7 +119,7 @@ export class InitService {
       logger.log('Styles will be created but not auto-imported')
     } else if (!validation.canInjectCss) {
       logger.warn('Tailwind import not found in CSS')
-      logger.log('Velar styles will not be auto-imported')
+      logger.log('Velyx styles will not be auto-imported')
     }
 
     // Display JS file status
@@ -141,15 +141,15 @@ export class InitService {
   }
 
   /**
-   * Create the Velar theme CSS file
+   * Create the Velyx theme CSS file
    * @param theme - Theme to use
-   * @param targetPath - Target CSS file path (default: "resources/css/velar.css")
+   * @param targetPath - Target CSS file path (default: "resources/css/velyx.css")
    * @returns Promise that resolves when theme is created
    * @throws Error if theme creation fails
    */
   async createThemeFile(
-    theme: VelarTheme,
-    targetPath = 'resources/css/velar.css',
+    theme: VelyxTheme,
+    targetPath = 'resources/css/velyx.css',
   ): Promise<void> {
     // Ensure directory exists
     const dirPath = targetPath.split('/').slice(0, -1).join('/')
@@ -159,7 +159,7 @@ export class InitService {
     if (!fs.existsSync(targetPath)) {
       try {
         copyTheme(theme, targetPath)
-        logger.success('Velar theme created')
+        logger.success('Velyx theme created')
         logger.info(targetPath)
       } catch (error) {
         throw new Error(
@@ -167,23 +167,23 @@ export class InitService {
         )
       }
     } else {
-      logger.info('velar.css already exists')
+      logger.info('velyx.css already exists')
     }
   }
 
   /**
-   * Inject Velar styles import into main CSS file
+   * Inject Velyx styles import into main CSS file
    * @param cssPath - Path to main CSS file
    * @returns Promise that resolves when import is injected
    */
   async injectStylesImport(cssPath: string): Promise<void> {
-    injectVelarImport(cssPath)
-    logger.success('Velar styles imported')
+    injectVelyxImport(cssPath)
+    logger.success('Velyx styles imported')
     logger.info(cssPath)
   }
 
   /**
-   * Generate and write Velar configuration file
+   * Generate and write Velyx configuration file
    * @param options - Initialization options
    * @param validation - Environment validation result
    * @returns Promise that resolves when config is written
@@ -192,13 +192,13 @@ export class InitService {
     options: InitOptions,
     validation: EnvironmentValidation,
   ): Promise<void> {
-    const config: VelarConfig = {
+    const config: VelyxConfig = {
       version: packageJson.version as string,
       theme: options.theme,
       packageManager: options.packageManager,
       css: {
         entry: validation.cssFile?.path ?? '',
-        velar: 'resources/css/velar.css',
+        velyx: 'resources/css/velyx.css',
       },
       js: {
         entry: validation.jsFile?.path ?? '',
@@ -208,8 +208,8 @@ export class InitService {
       },
     }
 
-    writeVelarConfig(config)
-    logger.success('velar.json config generated')
+    writeVelyxConfig(config)
+    logger.success('velyx.json config generated')
   }
 
   /**
@@ -235,9 +235,9 @@ export class InitService {
     logger.success(
       stylesImported ? 'Styles import complete' : 'Styles import pending',
     )
-    logger.success('velar.json created')
+    logger.success('velyx.json created')
     console.log('\nNext steps:')
-    console.log('  velar add button')
+    console.log('  velyx add button')
     console.log(
       '\n💡 Want to customize your Tailwind palette? Try https://tweakcn.com/ — a visual generator for Tailwind-compatible color scales.',
     )

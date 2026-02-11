@@ -1,6 +1,6 @@
 import { exec } from 'child_process'
 import { promisify } from 'util'
-import type { PackageManager, VelarDependency } from '@/src/types'
+import type { PackageManager, VelyxDependency } from '@/src/types'
 import type { IDependencyService } from '@/src/types/interfaces'
 import { logger } from '@/src/utils/logger'
 import { FilesystemService } from './filesystem-service'
@@ -40,7 +40,7 @@ export class DependencyService implements IDependencyService {
    * @returns Promise that resolves when installation is complete
    */
   async installDependencies(
-    dependencies: VelarDependency,
+    dependencies: VelyxDependency,
     packageManager: PackageManager,
   ): Promise<void> {
     const npmPromises = []

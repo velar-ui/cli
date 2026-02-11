@@ -4,8 +4,8 @@ import fsExtra from 'fs-extra'
 import type {
   AddResult,
   FailedComponent,
-  VelarComponentFile,
-  VelarComponentMeta,
+  VelyxComponentFile,
+  VelyxComponentMeta,
 } from '@/src/types'
 import type {
   IConfigManager,
@@ -123,8 +123,7 @@ export class ComponentService {
         )
       } catch (error) {
         logger.warn(
-          `Failed to install dependencies for ${componentName}: ${
-            (error as Error).message
+          `Failed to install dependencies for ${componentName}: ${(error as Error).message
           }`,
         )
         // Continue with file installation even if dependencies fail
@@ -214,8 +213,7 @@ export class ComponentService {
       logger.success(`Auto-imported ${componentName} into ${jsEntry}`)
     } catch (error) {
       logger.warn(
-        `Failed to auto-import JS for ${componentName}: ${
-          (error as Error).message
+        `Failed to auto-import JS for ${componentName}: ${(error as Error).message
         }`,
       )
     }
@@ -229,8 +227,8 @@ export class ComponentService {
    * @returns Destination file path
    */
   private getDestinationPath(
-    component: VelarComponentMeta,
-    file: VelarComponentFile,
+    component: VelyxComponentMeta,
+    file: VelyxComponentFile,
     componentsPath: string,
   ): string {
     switch (file.type) {
@@ -282,7 +280,7 @@ export class ComponentService {
 
     try {
       for (const file of plannedFiles) {
-        const tempPath = `${file.destPath}.velar-tmp`
+        const tempPath = `${file.destPath}.velyx-tmp`
         await this.fileSystem.writeFile(tempPath, file.content)
         tempFiles.push(tempPath)
       }
@@ -300,7 +298,7 @@ export class ComponentService {
       }
 
       for (const file of plannedFiles) {
-        const tempPath = `${file.destPath}.velar-tmp`
+        const tempPath = `${file.destPath}.velyx-tmp`
         await fsExtra.move(tempPath, file.destPath, { overwrite: true })
       }
 

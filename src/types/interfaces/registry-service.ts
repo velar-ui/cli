@@ -1,4 +1,4 @@
-import type { VelarComponentMeta, RegistryData } from '..'
+import type { VelyxComponentMeta, RegistryData } from '..'
 
 /**
  * Interface for registry service operations
@@ -18,7 +18,7 @@ export interface IRegistryService {
    * @throws ComponentNotFoundError if component doesn't exist
    * @throws NetworkError if fetch fails
    */
-  fetchComponent(name: string): Promise<VelarComponentMeta>
+  fetchComponent(name: string): Promise<VelyxComponentMeta>
 
   /**
    * Fetch file content for a component
@@ -36,6 +36,6 @@ export interface IRegistryService {
    * @returns Promise resolving to array of components including dependencies
    */
   resolveDependencies(
-    component: VelarComponentMeta,
-  ): Promise<readonly VelarComponentMeta[]>
+    component: VelyxComponentMeta,
+  ): Promise<readonly VelyxComponentMeta[]>
 }

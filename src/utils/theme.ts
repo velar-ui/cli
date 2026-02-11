@@ -1,9 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import type { VelarTheme } from '@/src/types'
+import type { VelyxTheme } from '@/src/types'
 
 type BaseColor = {
-  name: VelarTheme
+  name: VelyxTheme
   label: string
   cssVars: {
     light: Record<string, string>
@@ -62,7 +62,7 @@ export function getBaseColors(): BaseColor[] {
   return loadBaseColors()
 }
 
-export function getBaseColor(name: VelarTheme): BaseColor | undefined {
+export function getBaseColor(name: VelyxTheme): BaseColor | undefined {
   return loadBaseColors().find((color) => color.name === name)
 }
 
@@ -76,7 +76,7 @@ function renderCssVars(vars: Record<string, string>): string[] {
  * @param target - Target file path
  * @throws Error if theme doesn't exist or copy fails
  */
-export function copyTheme(theme: VelarTheme, target: string): void {
+export function copyTheme(theme: VelyxTheme, target: string): void {
   const baseColor = getBaseColor(theme)
   if (!baseColor) {
     throw new Error(`Theme "${theme}" not found in colors registry.`)

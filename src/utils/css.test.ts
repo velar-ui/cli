@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import {
   findMainCss,
   hasTailwindImport,
-  injectVelarImport,
+  injectVelyxImport,
   CSS_CANDIDATES,
 } from './css'
 
@@ -103,14 +103,14 @@ describe('css utils', () => {
     })
   })
 
-  describe('injectVelarImport', () => {
-    it('should inject Velar import after Tailwind import when Tailwind is present', () => {
+  describe('injectVelyxImport', () => {
+    it('should inject Velyx import after Tailwind import when Tailwind is present', () => {
       const originalContent = "@import 'tailwindcss';"
-      const expectedContent = '@import \'tailwindcss\';\n@import "./velar.css";'
+      const expectedContent = '@import \'tailwindcss\';\n@import "./velyx.css";'
 
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.readFileSync).toHaveBeenCalledWith('test.css', 'utf8')
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
@@ -120,13 +120,13 @@ describe('css utils', () => {
       )
     })
 
-    it('should inject Velar import at the end when no Tailwind import is present', () => {
+    it('should inject Velyx import at the end when no Tailwind import is present', () => {
       const originalContent = 'body { margin: 0; }'
-      const expectedContent = 'body { margin: 0; }\n@import "./velar.css";\n'
+      const expectedContent = 'body { margin: 0; }\n@import "./velyx.css";\n'
 
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         'test.css',
@@ -135,11 +135,11 @@ describe('css utils', () => {
       )
     })
 
-    it('should not inject Velar import if it already exists', () => {
-      const originalContent = '@import \'tailwindcss\';\n@import "./velar.css";'
+    it('should not inject Velyx import if it already exists', () => {
+      const originalContent = '@import \'tailwindcss\';\n@import "./velyx.css";'
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.readFileSync).toHaveBeenCalledWith('test.css', 'utf8')
       expect(mockFs.writeFileSync).not.toHaveBeenCalled()
@@ -156,11 +156,11 @@ describe('css utils', () => {
         vi.clearAllMocks()
         mockFs.readFileSync.mockReturnValue(input)
 
-        injectVelarImport('test.css')
+        injectVelyxImport('test.css')
 
         expect(mockFs.writeFileSync).toHaveBeenCalledWith(
           'test.css',
-          `${expected}\n@import "./velar.css";`,
+          `${expected}\n@import "./velyx.css";`,
           'utf8',
         )
       })
@@ -175,13 +175,13 @@ body {
 }`
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         'test.css',
         `/* Custom styles */
 @import "tailwindcss";
-@import "./velar.css";
+@import "./velyx.css";
 
 body {
   font-family: Arial, sans-serif;
@@ -192,10 +192,10 @@ body {
 
     it('should handle empty file', () => {
       const originalContent = ''
-      const expectedContent = '\n@import "./velar.css";\n'
+      const expectedContent = '\n@import "./velyx.css";\n'
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         'test.css',
@@ -206,10 +206,10 @@ body {
 
     it('should handle file with only comments', () => {
       const originalContent = '/* CSS File */'
-      const expectedContent = '/* CSS File */\n@import "./velar.css";\n'
+      const expectedContent = '/* CSS File */\n@import "./velyx.css";\n'
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         'test.css',
@@ -222,11 +222,11 @@ body {
       const originalContent = `@import 'tailwindcss';
 @import 'tailwindcss/forms';`
       const expectedContent = `@import 'tailwindcss';
-@import "./velar.css";
+@import "./velyx.css";
 @import 'tailwindcss/forms';`
       mockFs.readFileSync.mockReturnValue(originalContent)
 
-      injectVelarImport('test.css')
+      injectVelyxImport('test.css')
 
       expect(mockFs.writeFileSync).toHaveBeenCalledWith(
         'test.css',

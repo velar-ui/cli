@@ -10,18 +10,18 @@ import packageJson from '../package.json'
  */
 function displayIntro(): void {
   console.log('')
-  console.log(chalk.bold.cyan(`  ▼ VELAR CLI v${packageJson.version}`))
+  console.log(chalk.bold.cyan(`  ▼ VELYX CLI v${packageJson.version}`))
   console.log(chalk.gray('  Tailwind CSS v4+ components for Laravel'))
   console.log('')
 }
 
 /**
- * Velar CLI program entry point
+ * Velyx CLI program entry point
  */
 const program = new Command()
 program
-  .name('velar')
-  .description('Velar CLI: Copy UI components into your Laravel project')
+  .name('velyx')
+  .description('Velyx CLI: Copy UI components into your Laravel project')
   .version(
     packageJson.version || '1.0.0',
     '-v, --version',

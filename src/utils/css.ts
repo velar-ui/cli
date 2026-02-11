@@ -38,22 +38,22 @@ export function hasTailwindImport(css: string): boolean {
 }
 
 /**
- * Inject Velar CSS import into main CSS file
+ * Inject Velyx CSS import into main CSS file
  * @param cssPath - Path to the CSS file
  * @throws Error if file read/write fails
  */
-export function injectVelarImport(cssPath: string): void {
+export function injectVelyxImport(cssPath: string): void {
   let content = fs.readFileSync(cssPath, 'utf8')
-  if (content.includes('@import "./velar.css"')) {
+  if (content.includes('@import "./velyx.css"')) {
     return
   }
   if (hasTailwindImport(content)) {
     content = content.replace(
       /@import\s+["']tailwindcss["'];?/,
-      (match) => `${match}\n@import "./velar.css";`,
+      (match) => `${match}\n@import "./velyx.css";`,
     )
   } else {
-    content += '\n@import "./velar.css";\n'
+    content += '\n@import "./velyx.css";\n'
   }
   fs.writeFileSync(cssPath, content, 'utf8')
 }

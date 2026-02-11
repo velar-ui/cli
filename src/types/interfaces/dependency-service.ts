@@ -1,4 +1,4 @@
-import type { PackageManager, VelarDependency } from '..'
+import type { PackageManager, VelyxDependency } from '..'
 
 /**
  * Interface for dependency installation operations
@@ -11,7 +11,7 @@ export interface IDependencyService {
    * @returns Promise that resolves when installation is complete
    */
   installDependencies(
-    dependencies: VelarDependency,
+    dependencies: VelyxDependency,
     packageManager: PackageManager,
   ): Promise<void>
 

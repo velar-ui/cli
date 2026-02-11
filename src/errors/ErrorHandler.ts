@@ -1,9 +1,9 @@
 /**
- * Custom error class for Velar-specific errors with code and context
+ * Custom error class for Velyx-specific errors with code and context
  */
-export class VelarError extends Error {
+export class VelyxError extends Error {
   /**
-   * Create a new VelarError
+   * Create a new VelyxError
    * @param message - Error message
    * @param code - Error code for categorization
    * @param context - Additional context data
@@ -14,7 +14,7 @@ export class VelarError extends Error {
     public readonly context?: Readonly<Record<string, unknown>>,
   ) {
     super(message)
-    this.name = 'VelarError'
+    this.name = 'VelyxError'
   }
 }
 
@@ -28,7 +28,7 @@ export class ErrorHandler {
    * @param context - Context where the error occurred
    */
   handle(error: Error, context: string): void {
-    if (error instanceof VelarError) {
+    if (error instanceof VelyxError) {
       console.error(`[${error.code}] ${error.message}`)
       if (error.context) {
         console.error('Context:', error.context)

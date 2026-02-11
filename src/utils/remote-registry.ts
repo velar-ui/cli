@@ -1,7 +1,7 @@
 import { getGitHubRegistryUrl } from './environment'
 import { NetworkError, ComponentNotFoundError } from '../errors/errors'
 import { HttpService } from '../services/http-service'
-import type { GitHubFile, RegistryData, VelarComponentMeta } from '../types'
+import type { GitHubFile, RegistryData, VelyxComponentMeta } from '../types'
 
 /**
  * HTTP service instance for making requests
@@ -9,20 +9,20 @@ import type { GitHubFile, RegistryData, VelarComponentMeta } from '../types'
 const httpService = new HttpService()
 
 /**
- * Fetch a meta.json from a given URL and return as VelarComponentMeta
+ * Fetch a meta.json from a given URL and return as VelyxComponentMeta
  * @param metaUrl - URL to fetch meta.json from
- * @returns Promise resolving to VelarComponentMeta
+ * @returns Promise resolving to VelyxComponentMeta
  * @throws NetworkError if fetch or parsing fails
  */
 export async function fetchComponentMetaFromUrl(
   metaUrl: string,
-): Promise<VelarComponentMeta> {
+): Promise<VelyxComponentMeta> {
   try {
     const raw = await httpService.fetchText(metaUrl)
 
-    // Try to parse as VelarComponentMeta directly (raw JSON)
+    // Try to parse as VelyxComponentMeta directly (raw JSON)
     try {
-      const meta = JSON.parse(raw) as VelarComponentMeta
+      const meta = JSON.parse(raw) as VelyxComponentMeta
       if (meta && Array.isArray(meta.files)) {
         return meta
       }
@@ -36,7 +36,7 @@ export async function fetchComponentMetaFromUrl(
       if (!file.download_url) {
         throw new NetworkError('GitHubFile missing download_url')
       }
-      const meta = await httpService.fetchJson<VelarComponentMeta>(
+      const meta = await httpService.fetchJson<VelyxComponentMeta>(
         file.download_url,
       )
       if (meta && Array.isArray(meta.files)) {
@@ -74,7 +74,7 @@ export async function fetchGitHubRegistry(
 ): Promise<RegistryData> {
   try {
     // First try to get registry.json from the root
-    const registryUrl = `https://raw.githubusercontent.com/velar-ui/registry/${branch}/registry.json`
+    const registryUrl = `https://raw.githubusercontent.com/velyx-ui/registry/${branch}/registry.json`
     try {
       const registryData =
         await httpService.fetchJson<RegistryData>(registryUrl)
@@ -88,13 +88,13 @@ export async function fetchGitHubRegistry(
       `${getGitHubRegistryUrl()}/components`,
     )
 
-    const components: VelarComponentMeta[] = []
+    const components: VelyxComponentMeta[] = []
 
     for (const file of files) {
       if (file.type === 'dir') {
         try {
           // Try to get meta.json for each component
-          const meta = await httpService.fetchJson<VelarComponentMeta>(
+          const meta = await httpService.fetchJson<VelyxComponentMeta>(
             `${getGitHubRegistryUrl()}/components/${file.name}/meta.json`,
           )
           components.push({

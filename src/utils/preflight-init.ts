@@ -114,19 +114,19 @@ export async function preFlightInit(options: InitOptions): Promise<{
 
   const projectSpinner = spinner.start('Checking project environment...')
 
-  // Vérifier si velar.json existe déjà
-  const velarConfigPath = path.resolve(options.cwd, 'velar.json')
-  if (fs.existsSync(velarConfigPath) && !options.force) {
+  // Vérifier si velyx.json existe déjà
+  const velyxConfigPath = path.resolve(options.cwd, 'velyx.json')
+  if (fs.existsSync(velyxConfigPath) && !options.force) {
     projectSpinner.fail()
     logger.break()
 
     const { action } = await prompts({
       type: 'select',
       name: 'action',
-      message: `A ${highlighter.info('velar.json')} file already exists. What would you like to do?`,
+      message: `A ${highlighter.info('velyx.json')} file already exists. What would you like to do?`,
       choices: [
         {
-          title: 'Re-initialize Velar configuration',
+          title: 'Re-initialize Velyx configuration',
           value: 'reinit',
         },
         {
@@ -152,7 +152,7 @@ export async function preFlightInit(options: InitOptions): Promise<{
     }
 
     // Continue with re-initialization
-    logger.log(`Re-initializing Velar configuration...`)
+    logger.log(`Re-initializing Velyx configuration...`)
   }
 
   // Récupérer les infos du projet
@@ -165,7 +165,7 @@ export async function preFlightInit(options: InitOptions): Promise<{
     logger.error(
       `We could not detect a supported Laravel project at ${highlighter.info(
         options.cwd,
-      )}.\nVelar is designed to work with Laravel projects.`,
+      )}.\nVelyx is designed to work with Laravel projects.`,
     )
     logger.break()
     process.exit(1)
@@ -226,7 +226,7 @@ export async function preFlightInit(options: InitOptions): Promise<{
     alpineSpinner.succeed('Alpine.js found')
   }
 
-  // Vérifier Vite (recommandé pour Velar)
+  // Vérifier Vite (recommandé pour Velyx)
   const viteSpinner = spinner.start('Checking build tools...')
 
   if (!projectInfo.hasVite) {

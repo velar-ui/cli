@@ -1,6 +1,6 @@
 import chalk from 'chalk'
 import Table from 'cli-table3'
-import type { VelarComponentMeta } from '@/src/types'
+import type { VelyxComponentMeta } from '@/src/types'
 import { RegistryService } from '@/src/services/registry-service'
 import { logger } from '@/src/utils/logger'
 
@@ -12,9 +12,9 @@ export type ListOptions = {
 }
 
 function filterComponents(
-  components: readonly VelarComponentMeta[],
+  components: readonly VelyxComponentMeta[],
   query?: string,
-): VelarComponentMeta[] {
+): VelyxComponentMeta[] {
   if (!query) {
     return [...components]
   }
@@ -27,8 +27,8 @@ function filterComponents(
       : false
     const categoryMatch = component.categories
       ? component.categories.some((category) =>
-          category.toLowerCase().includes(normalized),
-        )
+        category.toLowerCase().includes(normalized),
+      )
       : false
 
     return nameMatch || descriptionMatch || categoryMatch
@@ -36,10 +36,10 @@ function filterComponents(
 }
 
 function sliceComponents(
-  components: VelarComponentMeta[],
+  components: VelyxComponentMeta[],
   offset?: number,
   limit?: number,
-): VelarComponentMeta[] {
+): VelyxComponentMeta[] {
   const start = Math.max(0, offset ?? 0)
   if (limit === undefined) {
     return components.slice(start)
@@ -107,5 +107,5 @@ export async function listComponents(options: ListOptions): Promise<void> {
 
   console.log(table.toString())
   console.log('')
-  logger.info(`Run ${chalk.green('velar add <component>')} to add one.`)
+  logger.info(`Run ${chalk.green('velyx add <component>')} to add one.`)
 }

@@ -72,7 +72,7 @@ async function fetchWithTimeout(
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        'User-Agent': 'Velar-CLI',
+        'User-Agent': 'Velyx-CLI',
         ...headers,
       },
     })

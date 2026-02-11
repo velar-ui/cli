@@ -1,7 +1,7 @@
 /**
- * Supported file types for Velar components
+ * Supported file types for Velyx components
  */
-export type VelarFileType = 'blade' | 'js' | 'css'
+export type VelyxFileType = 'blade' | 'js' | 'css'
 
 /**
  * Supported package managers
@@ -11,14 +11,14 @@ export type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun'
 /**
  * Available color themes
  */
-export type VelarTheme = 'neutral' | 'gray' | 'slate' | 'stone' | 'zinc'
+export type VelyxTheme = 'neutral' | 'gray' | 'slate' | 'stone' | 'zinc'
 
 /**
- * Represents a file in a Velar component
+ * Represents a file in a Velyx component
  */
-export interface VelarComponentFile {
+export interface VelyxComponentFile {
   /** File type */
-  type: VelarFileType
+  type: VelyxFileType
   /** Relative file path */
   path: string
 }
@@ -26,7 +26,7 @@ export interface VelarComponentFile {
 /**
  * Component dependencies
  */
-export interface VelarDependency {
+export interface VelyxDependency {
   /** Composer (PHP) dependencies */
   composer?: readonly string[]
   /** npm/yarn/pnpm/bun dependencies */
@@ -34,9 +34,9 @@ export interface VelarDependency {
 }
 
 /**
- * Velar component metadata
+ * Velyx component metadata
  */
-export interface VelarComponentMeta {
+export interface VelyxComponentMeta {
   /** Unique component name */
   name: string
   /** Component description */
@@ -44,37 +44,37 @@ export interface VelarComponentMeta {
   /** Component categories */
   categories?: readonly string[]
   /** List of component files */
-  files: readonly VelarComponentFile[]
+  files: readonly VelyxComponentFile[]
   /** Component dependencies */
-  dependencies?: VelarDependency
+  dependencies?: VelyxDependency
   /** Component path in registry */
   path: string
 }
 
 /**
- * Velar registry data
+ * Velyx registry data
  */
 export interface RegistryData {
   /** List of available components */
-  components: readonly VelarComponentMeta[]
+  components: readonly VelyxComponentMeta[]
 }
 
 /**
- * Velar configuration for a project
+ * Velyx configuration for a project
  */
-export interface VelarConfig {
+export interface VelyxConfig {
   /** Configuration version */
   version: string
   /** Selected color theme */
-  theme: VelarTheme
+  theme: VelyxTheme
   /** Package manager used */
   packageManager: PackageManager
   /** CSS configuration */
   css: {
     /** Main CSS file path */
     entry: string
-    /** Velar CSS file path */
-    velar: string
+    /** Velyx CSS file path */
+    velyx: string
   }
   /** JS configuration */
   js: {
@@ -145,7 +145,7 @@ export interface AddResult {
  */
 export interface ComponentList {
   /** List of components */
-  components: readonly VelarComponentMeta[]
+  components: readonly VelyxComponentMeta[]
   /** List of available categories */
   categories: readonly string[]
 }

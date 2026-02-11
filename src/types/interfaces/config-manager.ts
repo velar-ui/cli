@@ -1,4 +1,4 @@
-import type { VelarConfig, VelarTheme, PackageManager } from '..'
+import type { VelyxConfig, VelyxTheme, PackageManager } from '..'
 
 /**
  * Interface for configuration management
@@ -9,7 +9,7 @@ export interface IConfigManager {
    * @returns Promise resolving to configuration
    * @throws Error if configuration not found or invalid
    */
-  load(): Promise<VelarConfig>
+  load(): Promise<VelyxConfig>
 
   /**
    * Get the package manager from config
@@ -50,5 +50,5 @@ export interface IConfigManager {
    * @returns Theme name
    * @throws Error if config not loaded
    */
-  getTheme(): VelarTheme
+  getTheme(): VelyxTheme
 }

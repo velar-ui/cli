@@ -1,4 +1,4 @@
-import type { GitHubFile, RegistryData, VelarComponentMeta } from '../types'
+import type { GitHubFile, RegistryData, VelyxComponentMeta } from '../types'
 import type { IRegistryService } from '../types/interfaces'
 import {
   fetchComponent,
@@ -11,7 +11,7 @@ import { HttpService } from './http-service'
 import { spinner } from '../utils/spinner'
 
 /**
- * Service for interacting with the Velar component registry
+ * Service for interacting with the Velyx component registry
  */
 export class RegistryService implements IRegistryService {
   private readonly httpService: HttpService
@@ -45,7 +45,7 @@ export class RegistryService implements IRegistryService {
    * @throws ComponentNotFoundError if component doesn't exist
    * @throws NetworkError if fetch fails
    */
-  async fetchComponent(name: string): Promise<VelarComponentMeta> {
+  async fetchComponent(name: string): Promise<VelyxComponentMeta> {
     const file = await spinner.withTask(
       `Fetching component "${name}" metadata...`,
       () => fetchComponent(name),
@@ -79,12 +79,12 @@ export class RegistryService implements IRegistryService {
    * @returns Promise resolving to array of components including dependencies
    */
   async resolveDependencies(
-    component: VelarComponentMeta,
-  ): Promise<readonly VelarComponentMeta[]> {
+    component: VelyxComponentMeta,
+  ): Promise<readonly VelyxComponentMeta[]> {
     const visited = new Set<string>()
-    const resolved: VelarComponentMeta[] = []
+    const resolved: VelyxComponentMeta[] = []
 
-    const resolve = async (comp: VelarComponentMeta) => {
+    const resolve = async (comp: VelyxComponentMeta) => {
       if (visited.has(comp.name)) return
       visited.add(comp.name)
       resolved.push(comp)
@@ -105,14 +105,14 @@ export class RegistryService implements IRegistryService {
    */
   private async parseComponentMeta(
     file: GitHubFile,
-  ): Promise<VelarComponentMeta> {
+  ): Promise<VelyxComponentMeta> {
     if (!file.download_url) {
       throw new Error('GitHub file has no download URL')
     }
 
     try {
       const raw = await this.httpService.fetchText(file.download_url)
-      return JSON.parse(raw) as VelarComponentMeta
+      return JSON.parse(raw) as VelyxComponentMeta
     } catch (error) {
       throw new Error(
         `Failed to parse component meta: ${(error as Error).message}`,

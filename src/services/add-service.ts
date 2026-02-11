@@ -33,12 +33,12 @@ export class AddService {
   }
 
   /**
-   * Validate that Velar is initialized
+   * Validate that Velyx is initialized
    * @throws Error if not initialized
    */
   validateInitialization(): void {
     if (!this.configManager.validate()) {
-      throw new Error('Velar is not initialized')
+      throw new Error('Velyx is not initialized')
     }
   }
 
